@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>USGU DRESS 1 QC SEWING DASHBOARD</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+    
+    <style>
+        :root { 
+            --bg-body: #f1f5f9; --bg-card: #ffffff; --bg-input: #f8fafc; --bg-readonly: #f1f5f9;
+            --bg-section: #f8fafc; --bg-stepper: #f1f5f9; 
+            --text-main: #334155; --text-sub: #64748b; --text-brand: #0f172a; 
+            --border-line: #cbd5e1; --border-focus: #0f766e;
+            --primary: #0f766e; --primary-grad: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+            --accent: #d97706; --success: #10b981; --danger: #ef4444; 
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.1); --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.1); --shadow-btn: 0 4px 14px 0 rgba(15, 118, 110, 0.3);
+        }
+        .dark-mode {
+            --bg-body: #0f172a; --bg-card: #1e293b; --bg-input: #334155; --bg-readonly: #1e293b;
+            --bg-section: #1e293b; --bg-stepper: #334155; 
+            --text-main: #f8fafc; --text-sub: #94a3b8; --text-brand: #ffffff; 
+            --border-line: #475569; --border-focus: #14b8a6;
+            --primary: #14b8a6; --primary-grad: linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%);
+            --accent: #f59e0b; --success: #34d399; --danger: #f87171;
+        }
+
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-body); margin: 0; padding-bottom: 140px; font-size: 14px; color: var(--text-main); transition: background-color 0.3s, color 0.3s; user-select: none; -webkit-user-select: none; }
+        input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
+
+        .header { background: var(--bg-card); border-bottom: 3px solid var(--primary); box-shadow: var(--shadow-md); padding: 20px 15px; transition: background-color 0.3s; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 800px; margin: 0 auto; }
+        .title-area { display: flex; flex-direction: column; cursor: pointer; }
+        .main-title { font-weight: 900; color: var(--text-brand); font-size: 1.3rem; letter-spacing: 1px; }
+        .sub-title { font-size: 10px; color: var(--text-sub); font-weight: bold; letter-spacing: 1.5px; margin-top: 4px; }
+        .version-badge { background: var(--primary); color: white; padding: 2px 6px; border-radius: 4px; font-size: 9px; margin-left: 6px; font-weight: 900;}
+        .theme-toggle { background: var(--bg-body); border: 1px solid var(--border-line); color: var(--text-main); border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 800; display: flex; justify-content: center; align-items: center; cursor: pointer; outline: none; box-shadow: var(--shadow-sm); transition: all 0.2s; letter-spacing: 1px;}
+        
+        .container { padding: 15px; max-width: 800px; margin: 0 auto; }
+        .card { background: var(--bg-card); border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-line); }
+        .input-group { margin-bottom: 16px; position: relative; }
+        label { display: block; font-size: 11px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .req::after { content: " *"; color: var(--danger); font-size: 14px;}
+        input, textarea, select { width: 100%; padding: 14px 12px; border: 1px solid var(--border-line); border-radius: 6px; box-sizing: border-box; font-size: 14px; font-weight: 600; background: var(--bg-input); color: var(--text-main); font-family: inherit;}
+        input:focus, textarea:focus, select:focus { border-color: var(--border-focus); outline: none; box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15); }
+        
+        input[readonly].clickable { cursor: pointer; background: var(--bg-input); border-style: solid; color: var(--primary); text-align: center; font-size: 16px; }
+        input[readonly]:not(.clickable) { background: var(--bg-readonly); font-weight: bold; color: var(--danger); cursor: not-allowed; border-style: dashed; }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .responsive-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .dual-input { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr; gap: 12px; }
+            .responsive-grid { grid-template-columns: 1fr; gap: 12px; }
+        }
+        
+        .shift-container { display: flex; align-items: center; gap: 8px; }
+        .shift-container input[type="time"] { flex: 1; padding: 12px 10px; text-align: center; }
+        .shift-divider { font-weight: 900; color: var(--text-sub); }
+
+        .btn-add { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: 800; cursor: pointer; width: 100%; font-size: 13px; letter-spacing: 0.5px; box-shadow: var(--shadow-sm);}
+        .empty-state { text-align: center; padding: 20px; color: var(--text-sub); font-size: 12px; font-weight: bold; border: 2px dashed var(--border-line); border-radius: 8px; background: var(--bg-section);}
+        
+        .summary-card { background: var(--bg-section); border: 1px solid var(--border-line); border-radius: 8px; padding: 15px; margin-bottom: 12px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 12px;}
+        .summary-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border-line); padding-bottom: 10px; }
+        .summary-title { font-size: 14px; font-weight: 900; color: var(--primary); display: flex; flex-direction: column;}
+        .summary-subtitle { font-size: 11px; color: var(--text-main); font-weight: 700; margin-top: 3px; letter-spacing: 0.5px;}
+        .btn-del { background: var(--bg-card); color: var(--danger); border: 1px solid var(--danger); border-radius: 6px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 900; font-size: 12px;}
+
+        .flex-inputs { display: flex; gap: 12px; width: 100%; }
+        .stepper { display: flex; align-items: center; background: var(--bg-card); border: 1px solid var(--border-line); border-radius: 6px; overflow: hidden; flex: 1; }
+        .stepper button { background: var(--bg-stepper); border: none; width: 45px; height: 40px; font-size: 20px; font-weight: bold; color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .stepper input { flex: 1; min-width: 0; border: none; text-align: center; font-weight: 900; padding: 0; height: 40px; color: var(--text-brand); background: transparent; }
+        .stepper input::placeholder { color: var(--text-sub); font-weight: bold; opacity: 0.7; }
+        .stepper input:focus { box-shadow: none; }
+
+        .fab-container { position: fixed; right: 15px; bottom: 130px; display: flex; flex-direction: column; gap: 12px; z-index: 999; align-items: flex-end; }
+        .fab-sync { background: var(--danger); color: white; border: none; border-radius: 8px; width: auto; padding: 10px 16px; font-weight: 800; font-size: 11px; display: none; letter-spacing: 0.5px; box-shadow: var(--shadow-md);}
+
+        .action-buttons { position: fixed; bottom: 15px; left: 15px; right: 15px; max-width: 770px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+        .row-btns { display: flex; gap: 10px; }
+        .btn-action { flex: 1; border: none; padding: 12px 5px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 12px; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.5px;}
+        .btn-server { background: var(--primary-grad); box-shadow: var(--shadow-btn); font-size: 14px; width: 100%; padding: 14px;}
+        .btn-xl { background: var(--bg-card); color: var(--text-brand); border: 1px solid var(--border-line); box-shadow: var(--shadow-sm);}
+        .btn-reset { background: var(--bg-card); color: var(--danger); border: 1px solid var(--danger); box-shadow: var(--shadow-sm);}
+        .btn-spv { background: #1e293b; color: #f8fafc; border: 1px solid #0f172a; box-shadow: var(--shadow-sm);}
+
+        #loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); color: white; z-index: 2000; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; flex-direction: column; text-align: center; backdrop-filter: blur(4px); letter-spacing: 1px;}
+        .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--primary); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .chart-container { display: flex; align-items: center; justify-content: center; gap: 20px; background: var(--bg-section); padding: 20px; border-radius: 8px; border: 1px solid var(--border-line); margin-bottom: 20px; }
+        .chart-box { width: 110px; height: 110px; position: relative; }
+        .chart-details { display: flex; flex-direction: column; gap: 4px; }
+        .chart-title { font-size: 11px; font-weight: 900; color: var(--text-sub); letter-spacing: 1px; }
+        .chart-pct { font-size: 26px; font-weight: 900; color: var(--danger); margin-bottom: 5px;}
+        .chart-legend { font-size: 12px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px;}
+        .legend-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block;}
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.85); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-box { background: var(--bg-card); width: 95%; max-width: 450px; border-radius: 12px; padding: 20px; box-shadow: var(--shadow-md); display: flex; flex-direction: column; gap: 15px; max-height: 90vh; overflow-y: auto;}
+        .modal-title { font-weight: 900; color: var(--primary); font-size: 16px; text-align: center; border-bottom: 2px solid var(--border-line); padding-bottom: 10px;}
+        
+        .grid-line-selection { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .line-btn { background: var(--bg-section); border: 1px solid var(--border-line); padding: 12px 5px; border-radius: 8px; font-weight: 900; color: var(--text-main); cursor: pointer; font-size: 13px; text-align: center; transition: all 0.2s; }
+        .line-btn.selected { background: var(--primary); color: white; border-color: var(--primary); transform: scale(0.95); }
+        .line-btn.wide { grid-column: span 2; background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+        .line-btn.wide.selected { background: var(--primary); color: white; }
+
+        .btn-save-line { background: var(--bg-body); color: var(--text-main); border: 1px solid var(--border-line); padding: 15px; border-radius: 8px; font-weight: 900; cursor: pointer; width: 100%; margin-top: 10px; font-size: 14px; letter-spacing: 1px;}
+        
+        /* Modal SweetAlert Custom UI */
+        .swal-custom-popup { border-radius: 15px !important; padding: 25px !important; }
+        .dark-mode .swal-custom-popup { background: var(--bg-card) !important; color: var(--text-main) !important; }
+    </style>
+</head>
+<body>
+
+<div id="loading"><div class="spinner"></div><div id="loading-text">MEMPROSES...</div></div>
+
+<datalist id="buyerList">
+    <option value="AMERICAN EAGLE OUTFITTERS"><option value="ANN INC."><option value="BROOKS BROTHERS"><option value="CALVIN KLEIN">
+    <option value="CARHARTT"><option value="CHICO'S"><option value="DILLARD'S/MURANO"><option value="DULUTH TRADING">
+    <option value="EILEEN FISHER"><option value="GU"><option value="HUGO BOSS"><option value="J.CREW">
+    <option value="J.JILL"><option value="JMC"><option value="LEVI'S"><option value="LILLY PULITZER">
+    <option value="LL.BEAN"><option value="LULULEMON"><option value="MACY'S"><option value="NIC & ZOE">
+    <option value="PENGUIN"><option value="PERRY ELLIS"><option value="POLO RALPH LAUREN"><option value="PVH">
+    <option value="TAILORED BRANDS"><option value="TALBOTS"><option value="TH NA"><option value="TOMMY BAHAMA">
+    <option value="UNIQLO"><option value="VICTORIA'S SECRET"><option value="VINEYARD VINES"><option value="WHBM">
+</datalist>
+
+<div class="header">
+    <div class="header-content">
+        <div class="title-area">
+            <div class="main-title">QC SEWING DASHBOARD</div>
+            <div class="sub-title">QUALITY ENGINEERING USGU DRESS 1 <span class="version-badge" id="verBadge">v1.2-REV</span></div>
+        </div>
+        <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">DARK</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="input-group">
+            <label class="req">NAMA QC / INSPECTOR:</label>
+            <div class="dual-input">
+                <select id="qc_inline" onchange="saveData()"></select>
+                <select id="qc_endline" onchange="saveData()"></select>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-sub); margin-top:4px; font-weight:bold;">
+                <span style="padding-left:5px;">(INLINE)</span><span style="padding-right:5px;">(ENDLINE)</span>
+            </div>
+        </div>
+        
+        <div class="grid">
+            <div class="input-group">
+                <label class="req">STATUS PRODUKSI:</label>
+                <select id="status" onchange="saveData()">
+                    <option value="" disabled selected>-- Pilih --</option>
+                    <option value="RUNNING">RUNNING</option>
+                    <option value="START">START</option>
+                    <option value="EMPTY LINE">EMPTY LINE</option>
+                </select>
+            </div>
+            
+            <div class="input-group"><label class="req">TANGGAL:</label><input type="date" id="tanggal" onchange="saveData()"></div>
+            
+            <div class="input-group">
+                <label>JAM ISTIRAHAT:</label>
+                <select id="jam_istirahat" onchange="saveData()">
+                    <option value="0" selected>0 Menit (Tanpa Istirahat)</option>
+                    <option value="30">30 Menit</option>
+                    <option value="60">60 Menit</option>
+                    <option value="90">90 Menit</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label class="req">NAMA LINE:</label>
+                <input type="text" id="line_name" class="clickable" placeholder="Ketuk Pilih Line" readonly onclick="openLineModal()">
+            </div>
+            
+            <div class="input-group">
+                <label class="req">ORDER/BUYER:</label>
+                <select id="buyer_select" onchange="handleBuyerChange()">
+                    <option value="" disabled selected>-- Pilih Line Dulu --</option>
+                </select>
+                <input type="text" id="buyer" list="buyerList" placeholder="Ketik Manual Buyer..." style="display:none; margin-top:8px;" oninput="saveData()">
+            </div>
+            
+            <div class="input-group">
+                <label>STYLE:</label>
+                <select id="style_select" onchange="handleStyleChange()">
+                    <option value="" disabled selected>-- Pilih Buyer Dulu --</option>
+                </select>
+                <input type="text" id="style" placeholder="Cth: 450211" style="display:none; margin-top:8px;" oninput="formatStyleInput(this)">
+            </div>
+            
+            <div class="input-group" style="grid-column: span 2;">
+                <label class="req">SHIFT: <span id="shift_hours" style="color:var(--primary); font-weight:900;"></span></label>
+                <div class="shift-container">
+                    <input type="time" id="shift_start" oninput="calculateShiftHours(); saveData()">
+                    <span class="shift-divider">-</span>
+                    <input type="time" id="shift_end" oninput="calculateShiftHours(); saveData()">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" id="add-defect-section">
+        <label style="border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 15px; font-size: 12px; color: var(--primary); font-weight: 800;">TAMBAH DEFECT BARU:</label>
+        
+        <div class="grid">
+            <div class="input-group">
+                <label>1. PILIH AREA / PROSES:</label>
+                <select id="sel_area">
+                    <option value="" disabled selected>-- Pilih Area --</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>2. PILIH JENIS DEFECT:</label>
+                <select id="sel_type">
+                    <option value="" disabled selected>-- Pilih Jenis --</option>
+                </select>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-add" style="flex: 1;" onclick="addDefectToList()">TAMBAHKAN KE DAFTAR</button>
+        </div>
+    </div>
+
+    <div class="card" id="summary-section">
+        <label style="border-bottom: 2px solid var(--accent); padding-bottom: 8px; margin-bottom: 15px; font-size: 12px; color: var(--accent); font-weight: 800;">DAFTAR RANGKUMAN DEFECT:</label>
+        <div id="active_defects_container">
+            <div class="empty-state" id="empty_state">
+                BELUM ADA DEFECT YANG DITAMBAHKAN.<br>
+                <span style="font-weight:normal; font-size:11px;">Silakan pilih Area & Jenis di atas lalu klik Tambahkan.</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" id="kalkulasi-section">
+        <label style="border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 15px; font-size: 12px; color: var(--primary); font-weight: 800;">KALKULASI & KETERANGAN:</label>
+        
+        <div class="chart-container">
+            <div class="chart-box">
+                <canvas id="defectChart"></canvas>
+            </div>
+            <div class="chart-details">
+                <div class="chart-title">OVERALL STATUS</div>
+                <div class="chart-pct" id="chart_pct">0% DEFECT</div>
+                <div class="chart-legend"><span class="legend-dot" style="background:var(--success);"></span> GOOD : <span id="chart_good">0 (0%)</span></div>
+                <div class="chart-legend"><span class="legend-dot" style="background:var(--danger);"></span> DEFECT : <span id="chart_def">0</span></div>
+            </div>
+        </div>
+
+        <div class="responsive-grid">
+            <div class="input-group" style="margin-bottom:0;">
+                <label style="color:var(--danger);">QTY.DEFECT (TLS | 100%):</label>
+                <div class="dual-input">
+                    <input type="number" id="tot_def_tls" readonly value="0" placeholder="TLS">
+                    <input type="number" id="tot_def_100" readonly value="0" placeholder="100%">
+                </div>
+            </div>
+            <div class="input-group" style="margin-bottom:0;">
+                <label class="req">QTY.INSPECT (TLS | 100%):</label>
+                <div class="dual-input">
+                    <input type="number" id="qty_insp_tls" oninput="formatAntiMinus(this); calculate()" placeholder="Insp TLS">
+                    <input type="number" id="qty_insp_100" oninput="formatAntiMinus(this); calculate()" placeholder="Insp 100%">
+                </div>
+            </div>
+            <div class="input-group" style="margin-bottom:0;">
+                <label style="color:var(--danger);">% DEFECT (TLS | 100%):</label>
+                <div class="dual-input">
+                    <input type="text" id="pct_def_tls" readonly value="0%" placeholder="TLS">
+                    <input type="text" id="pct_def_100" readonly value="0%" placeholder="100%">
+                </div>
+            </div>
+            <div class="input-group" style="margin-bottom:0;">
+                <label>TRANSFER:</label>
+                <input type="number" id="qty_trans" oninput="formatAntiMinus(this); saveData()" placeholder="0">
+            </div>
+        </div>
+        
+        <div class="input-group" style="margin-top: 14px;">
+            <label>KETERANGAN:</label>
+            <input type="text" id="keterangan" placeholder="Isi Note..." oninput="saveData()">
+        </div>
+    </div>
+</div>
+
+<div class="fab-container">
+    <button class="fab-sync" id="btnSync" onclick="pushOfflineData()">SINKRON (0)</button>
+</div>
+
+<div class="action-buttons">
+    <button class="btn-action btn-server" id="btnSubmitMain" onclick="showSummaryAndSubmit()">CONFIRM & SUBMIT</button>
+    <div class="row-btns">
+        <button class="btn-action btn-reset" onclick="resetForm()">RESET FORM</button>
+        <button class="btn-action btn-xl" onclick="exportToExcel()">EXPORT EXCEL</button>
+        <button class="btn-action btn-spv" onclick="recapSPV()">🔐 TUTUP SHIFT</button>
+    </div>
+</div>
+
+<div id="lineModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-title">PILIH SATU NAMA LINE</div>
+        <div class="grid-line-selection" id="gridLineSelection">
+            </div>
+        <button class="btn-save-line" onclick="closeLineModal()">BATAL KELUAR</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('contextmenu', event => event.preventDefault()); 
+    document.onkeydown = function(e) {
+        if(e.keyCode == 123) return false; 
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; 
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; 
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; 
+        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; 
+    }
+
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbykRNhpXwq1fuPsoP7tGHeKvReiVYBtgrVMv-Dd8ghDEMc5f0RgpQh36Mg5r9kQUGnq/exec";
+    const APP_VERSION = "1.2"; 
+
+    let defectChart; 
+    let selectedLine = "";
+
+    const listLineMaster = [
+        "PREPARATION", "1", "1B", "2", "3A", "3B", "4", "5", "6", "6B", "7", "8A", "8B", "9A", "9B", 
+        "10", "11", "12", "13", "14", "15", "16", "16A", "16B", "17A", "17B", "18", "19A", "19B", "20", "21", "MINILINE"
+    ];
+    
+    // LIST QC YANG AKAN MASUK KE DROPDOWN
+    const listQC = [
+        "Afifah Maulidina", "Agsagita Cita A", "Ajeng Fitriani", "Alfina Damayanti", "Alfina Putri SP",
+        "Anik Anastia", "Anis Nuraeni", "Antri Parela", "Ariella Alma", "Astrid Ayu P", "Bella",
+        "Chairani Cahya", "Clara Senja", "Dewi Cahyani", "Dewi Istiqomah", "Dini Febriyanti",
+        "Disa Salvarona", "Diyah Budiyanti", "Djanti Atma L", "Dwi Suryanti", "Dwi Wahyuningsih",
+        "Eko Setya S", "Erna Dwi Yulianti", "Faeko Ernawati", "Fathiya Salsabila", "Fiky Yulitha",
+        "Fiti Handayani", "Fitri Destiar", "Fitri Nofitasari", "Haura Fitri Nafisah", "Ina Eliza",
+        "Jessy Septianasari", "Lailatul Ulum", "Marta Siput", "Meitanoya Devanya", "Mellania Dona P",
+        "Nadya Putri Wldr", "Najwa Rara", "Nina Sulistyowati", "Nurul Fadillah", "Putri Chabellita",
+        "Ririk Setyowati", "Ririn Kurniasari", "Risma Dwi Yuliyani", "Sevira Dwi Nur", "Sifa Maulina",
+        "Siti Diya Az Zahra", "Sukmawati C", "Suwarni", "Tariska Dewi Setyoningsih", "Ummaiyatun Nafiah",
+        "Violita", "Windi Ayu NH", "Yuli Astuti", "Yulinda Syafira"
+    ];
+
+    const lineDB = {
+        "1": { "TH EU": ["WW0WW50599"], "CK NA": ["47H693G"] },
+        "2": { "J JILL": ["WDR348041"], "WHBM": ["010-26W41919"], "CK NA": ["47H905G"] },
+        "3A": { "DILLARDS": ["S65WM207", "S6GBA-T5705M", "Y35WM100", "Y35WM107", "Y35WM108", "Y35WM105", "Y35WM106", "Y35WM100A", "S65WM500", "Y55KM220"] },
+        "3B": { "DILLARDS": ["Y55KM220", "Y55KM223", "Y35WM100", "Y35WM107", "Y35WM108", "Y35WM105", "Y35WM106", "Y35WM100A", "S65WM500"], "E FISHER": ["S6OLA-T6478M", "S6GBA-T5705M"] },
+        "4": { "LILLY P": ["021186"], "CK NA": ["47H012G"], "LL BEAN": ["526440"] },
+        "5": { "E FISHER": ["S6YCP-T6064M"], "J JILL": ["WDR348041", "WDR348042", "WDR348043"], "CK NA": ["47H688G"] },
+        "6": { "E FISHER": ["S6YCR-P4869M", "S6AJ9-T5704M", "S6GBA-T5705M"], "WHBM": ["010-26W41919", "610-26W41919"] },
+        "7": {},
+        "8A": { "J MC": ["13410U201"], "CK NA": ["44E107G", "44E108G"] },
+        "8B": { "CK NA": ["44E107G", "44E108G"] },
+        "9A": { "CK NA": ["47F104G"], "LILLY P": ["023049"], "VS": ["10347757"] },
+        "9B": { "J JILL": ["WTP345601", "WTP345602", "WTP345603"], "VS": ["10347757"] },
+        "10": { "J JILL": ["WTP347853"], "CK NA": ["40EM125", "4RH100G"] },
+        "11": { "LILLY P": ["023049"], "LL BEAN": ["526440"], "E FISHER": ["F6URT-P4366M"] },
+        "12": { "NIC & ZOE": ["M261303", "M261303P", "M261303W", "F261909N"] },
+        "13": { "E FISHER": ["S6OCB-S4431P"], "DILLARDS": ["Y55KM223", "Y55KM224"] },
+        "14": { "E FISHER": ["F6URT-T6200P"], "VS": ["10241679"], "SAMPLE": [], "CK NA": ["47F148G", "47K104G", "47K600G"] },
+        "15": { "LILLY P": ["019381"], "NIC & ZOE": ["M261621"], "LL BEAN": ["526440"] },
+        "16": { "LILLY P": ["019381"], "CHICCO’S": ["210-26C139257"], "E FISHER": ["S6AJ9-T5704M"], "WHBM": ["010-26W41919"] },
+        "17A": { "BROOK BROTHERS": ["1000108578"] },
+        "17B": { "J JILL": ["WDR347571"], "BROOK BROTHERS": ["1000108578"] },
+        "18": { "SAMPLE": [], "CK NA": ["47H013G", "47H101G", "47K108G", "47K630G", "47G600G", "47H129G", "47H905G", "47H906G", "47H915G", "47H693G", "4LH188G", "4LF180G", "4RH102G", "47K004G", "47K459G", "47K115G", "47K117G", "47K631G", "44K619G", "47L119G", "47L795G"], "JONNIE’O": ["JWK0100350"], "Vneet Tommy": ["274656"], "E FISHER": ["S7GC1-T6602M", "S7DEE-P4936M", "S7BDY-T6598M", "S7BDY-D5510M", "S7SAU-P4689M"], "LILLY P": ["020386", "022713", "022830", "023285", "023308", "023310", "023110"] },
+        "19A": { "CK NA": ["40EM125", "4LH111G"] },
+        "19B": { "CK NA": ["40EM125", "4LH111G"] },
+        "20": { "J MC": ["18174U101"], "CK NA": ["40EM125", "4LH111G"] }
+    };
+
+    const defectAreas = [
+        "COLLAR/NECK", "SHOULDER", "ARMHOLE", "SLEEVE", "MANSET", "SLIT", 
+        "BOTTOM HEMMING", "FRONT PLACKET", "SIDE SEAM", "POCKET", 
+        "MAIN LABEL/CARE LABEL", "FRONT/BACK RISE", "LINING", "DECORATIVE", 
+        "BUTTON", "BUTTON HOLE", "BARTACK", "HANDMADE", "STEAM/IRONING", 
+        "FRONT BODY", "BACK BODY", "WAIST", "INSEAM/OUTSEAM", "OVERLOOK"
+    ];
+    
+    const defectTypes = [
+        "RUN OF STITCH", "BROKEN STITCH", "PLEATED", "SKIP STITCH", "MISSING", 
+        "SHADING", "STAIN", "PUCKERING", "FABRIC DEFECT", "TWIST/ROPPING/FULLNESS", 
+        "UNMATCH/HIGH LOW", "TRIMMING", "INCONSISTENT", "POORSHAPE/POINTED/EXPOSED"
+    ];
+
+    let activeDefects = {}; 
+
+    function toggleTheme() { 
+        document.body.classList.toggle('dark-mode'); 
+        document.getElementById('themeBtn').innerText = document.body.classList.contains('dark-mode') ? 'LIGHT' : 'DARK'; 
+        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode')); 
+    }
+    
+    function setDefaultDate() { const d = new Date(); document.getElementById('tanggal').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+    
+    function formatAntiMinus(input) { input.value = input.value.replace(/[^0-9]/g, ''); }
+
+    function formatStyleInput(input) {
+        input.value = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        saveData();
+    }
+
+    function calculateShiftHours() {
+        let start = document.getElementById('shift_start').value;
+        let end = document.getElementById('shift_end').value;
+        let displaySpan = document.getElementById('shift_hours');
+        
+        if(start && end) {
+            let t1 = start.split(":");
+            let t2 = end.split(":");
+            let d1 = new Date(2000, 0, 1, parseInt(t1[0],10), parseInt(t1[1],10)); 
+            let d2 = new Date(2000, 0, 1, parseInt(t2[0],10), parseInt(t2[1],10));
+            
+            if(d2 < d1) d2.setDate(d2.getDate() + 1); 
+            
+            let diff = (d2 - d1) / (1000 * 60 * 60);
+            let hours = Math.floor(diff);
+            let mins = Math.round((diff % 1) * 60);
+            
+            displaySpan.innerText = `(${hours} Jam ${mins > 0 ? mins + ' Mnt' : ''})`;
+        } else { 
+            displaySpan.innerText = ""; 
+        }
+    }
+
+    function openLineModal() {
+        selectedLine = document.getElementById('line_name').value || "";
+        renderLineSelection();
+        document.getElementById('lineModal').style.display = 'flex';
+    }
+
+    function selectLine(line) {
+        selectedLine = line;
+        document.getElementById('line_name').value = line;
+        document.getElementById('lineModal').style.display = 'none';
+        updateBuyerDropdown(); 
+        saveData();
+    }
+
+    function closeLineModal() {
+        document.getElementById('lineModal').style.display = 'none';
+    }
+
+    function renderLineSelection() {
+        let gridHtml = listLineMaster.map(line => {
+            let isSel = (selectedLine === line) ? 'selected' : '';
+            let isWide = (line === "PREPARATION" || line === "MINILINE") ? 'wide' : '';
+            return `<button class="line-btn ${isSel} ${isWide}" onclick="selectLine('${line}')">${line}</button>`;
+        }).join('');
+        document.getElementById('gridLineSelection').innerHTML = gridHtml;
+    }
+
+    function updateBuyerDropdown() {
+        const sel = document.getElementById('buyer_select');
+        const inp = document.getElementById('buyer');
+        sel.innerHTML = '<option value="" disabled selected>-- Pilih Buyer --</option>';
+        
+        if (selectedLine && lineDB[selectedLine] && Object.keys(lineDB[selectedLine]).length > 0) {
+            Object.keys(lineDB[selectedLine]).forEach(b => {
+                sel.innerHTML += `<option value="${b}">${b}</option>`;
+            });
+            sel.innerHTML += `<option value="MANUAL" style="color:var(--danger);">+ KETIK MANUAL</option>`;
+            sel.style.display = 'block';
+            sel.value = "";
+            inp.style.display = 'none';
+            inp.value = "";
+        } else {
+            sel.innerHTML = `<option value="MANUAL">-- KETIK MANUAL --</option>`;
+            sel.value = "MANUAL";
+            sel.style.display = 'none';
+            inp.style.display = 'block';
+            inp.value = "";
+        }
+        updateStyleDropdown();
+    }
+
+    function handleBuyerChange() {
+        const sel = document.getElementById('buyer_select');
+        const inp = document.getElementById('buyer');
+        if (sel.value === 'MANUAL') {
+            inp.style.display = 'block';
+            inp.value = '';
+            inp.focus();
+        } else {
+            inp.style.display = 'none';
+            inp.value = sel.value;
+        }
+        updateStyleDropdown();
+        saveData();
+    }
+
+    function updateStyleDropdown() {
+        const buyer = document.getElementById('buyer_select').value;
+        const sel = document.getElementById('style_select');
+        const inp = document.getElementById('style');
+        sel.innerHTML = '<option value="" disabled selected>-- Pilih Style --</option>';
+        
+        if (selectedLine && buyer && buyer !== 'MANUAL' && lineDB[selectedLine] && lineDB[selectedLine][buyer] && lineDB[selectedLine][buyer].length > 0) {
+            lineDB[selectedLine][buyer].forEach(s => {
+                sel.innerHTML += `<option value="${s}">${s}</option>`;
+            });
+            sel.innerHTML += `<option value="MANUAL" style="color:var(--danger);">+ KETIK MANUAL</option>`;
+            sel.style.display = 'block';
+            sel.value = "";
+            inp.style.display = 'none';
+            inp.value = "";
+        } else {
+            sel.innerHTML = `<option value="MANUAL">-- KETIK MANUAL --</option>`;
+            sel.value = "MANUAL";
+            sel.style.display = 'none';
+            inp.style.display = 'block';
+            inp.value = "";
+        }
+    }
+
+    function handleStyleChange() {
+        const sel = document.getElementById('style_select');
+        const inp = document.getElementById('style');
+        if (sel.value === 'MANUAL') {
+            inp.style.display = 'block';
+            inp.value = '';
+            inp.focus();
+        } else {
+            inp.style.display = 'none';
+            inp.value = sel.value;
+        }
+        saveData();
+    }
+
+    function initDropdowns() {
+        // Init QC List
+        let htmlQC = '<option value="" disabled selected>-- Pilih --</option><option value="-" style="color:var(--danger);">TIDAK ADA/KOSONG</option>';
+        listQC.forEach(qc => { htmlQC += `<option value="${qc}">${qc}</option>`; });
+        document.getElementById('qc_inline').innerHTML = htmlQC;
+        document.getElementById('qc_endline').innerHTML = htmlQC;
+
+        // Init Defect Area & Type
+        let selArea = document.getElementById('sel_area');
+        let selType = document.getElementById('sel_type');
+        selArea.innerHTML = '<option value="" disabled selected>-- Pilih Area --</option>';
+        selType.innerHTML = '<option value="" disabled selected>-- Pilih Jenis --</option>';
+        
+        let sortedAreas = defectAreas.map((name, index) => ({ name, index })).sort((a, b) => a.name.localeCompare(b.name));
+        let sortedTypes = defectTypes.map((name, index) => ({ name, index })).sort((a, b) => a.name.localeCompare(b.name));
+
+        sortedAreas.forEach((obj) => { selArea.innerHTML += `<option value="${obj.index}">${obj.name}</option>`; });
+        sortedTypes.forEach((obj) => { selType.innerHTML += `<option value="${obj.index}">${obj.name}</option>`; });
+    }
+
+    function initChart() {
+        const ctx = document.getElementById('defectChart').getContext('2d');
+        defectChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Good', 'Defect'],
+                datasets: [{
+                    data: [1, 0], 
+                    backgroundColor: ['#cbd5e1', '#ef4444'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                }
+            }
+        });
+    }
+
+    function addDefectToList() {
+        let aIdx = document.getElementById('sel_area').value;
+        let tIdx = document.getElementById('sel_type').value;
+        
+        if(aIdx === "" || tIdx === "") {
+            Swal.fire('Perhatian', 'Pilih Area dan Jenis Defect terlebih dahulu.', 'warning'); return;
+        }
+
+        let key = `${aIdx}_${tIdx}`;
+        if(activeDefects[key]) {
+            Swal.fire('Info', 'Defect ini sudah ada di daftar rangkuman.', 'info'); return;
+        }
+
+        activeDefects[key] = { aIdx: aIdx, tIdx: tIdx, tls: "", qty100: "" };
+        document.getElementById('sel_area').value = "";
+        document.getElementById('sel_type').value = "";
+        
+        renderDefectList();
+        if (window.navigator && window.navigator.vibrate) navigator.vibrate(50);
+    }
+
+    function renderDefectList() {
+        let container = document.getElementById('active_defects_container');
+        let html = "";
+        let count = 0;
+
+        for(let key in activeDefects) {
+            count++;
+            let item = activeDefects[key];
+            let areaName = defectAreas[item.aIdx];
+            let typeName = defectTypes[item.tIdx];
+
+            html += `
+            <div class="summary-card" id="card_${key}">
+                <div class="summary-header">
+                    <div class="summary-title">
+                        <span>${areaName}</span>
+                        <span class="summary-subtitle">↳ ${typeName}</span>
+                    </div>
+                    <button class="btn-del" onclick="removeDefect('${key}')">X</button>
+                </div>
+                <div class="flex-inputs">
+                    <div class="stepper">
+                        <button onclick="adjVal('${key}', 'tls', -1)">-</button>
+                        <input type="number" id="inp_tls_${key}" value="${item.tls}" oninput="manualInput('${key}', 'tls', this.value)" placeholder="TLS">
+                        <button onclick="adjVal('${key}', 'tls', 1)">+</button>
+                    </div>
+                    <div class="stepper">
+                        <button onclick="adjVal('${key}', 'qty100', -1)">-</button>
+                        <input type="number" id="inp_100_${key}" value="${item.qty100}" oninput="manualInput('${key}', 'qty100', this.value)" placeholder="100%">
+                        <button onclick="adjVal('${key}', 'qty100', 1)">+</button>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        if(count === 0) {
+            container.innerHTML = `<div class="empty-state" id="empty_state">BELUM ADA DEFECT YANG DITAMBAHKAN.<br><span style="font-weight:normal; font-size:11px;">Silakan pilih Area & Jenis di atas lalu klik Tambahkan.</span></div>`;
+        } else {
+            container.innerHTML = html;
+        }
+        calculate();
+    }
+
+    function adjVal(key, field, amount) {
+        let val = parseInt(activeDefects[key][field]) || 0;
+        let newVal = val + amount;
+        if(newVal < 0) newVal = 0;
+        
+        activeDefects[key][field] = newVal > 0 ? newVal : "";
+        document.getElementById(field === 'tls' ? `inp_tls_${key}` : `inp_100_${key}`).value = newVal > 0 ? newVal : "";
+        if (window.navigator && window.navigator.vibrate) navigator.vibrate(40); 
+        calculate();
+    }
+
+    function manualInput(key, field, value) {
+        let cleanVal = value.replace(/[^0-9]/g, '');
+        let num = parseInt(cleanVal) || 0;
+        activeDefects[key][field] = num > 0 ? num : "";
+        document.getElementById(field === 'tls' ? `inp_tls_${key}` : `inp_100_${key}`).value = num > 0 ? num : "";
+        calculate();
+    }
+
+    function removeDefect(key) { delete activeDefects[key]; renderDefectList(); }
+
+    function calculate() {
+        let totalSumTls = 0, totalSum100 = 0;
+        for(let key in activeDefects) {
+            totalSumTls += parseInt(activeDefects[key].tls) || 0;
+            totalSum100 += parseInt(activeDefects[key].qty100) || 0;
+        }
+
+        let ttls = document.getElementById('tot_def_tls'); if(ttls) ttls.value = totalSumTls;
+        let t100 = document.getElementById('tot_def_100'); if(t100) t100.value = totalSum100;
+
+        let elInspTls = document.getElementById('qty_insp_tls');
+        const inspTls = elInspTls ? (parseInt(elInspTls.value) || 0) : 0;
+        
+        let elInsp100 = document.getElementById('qty_insp_100');
+        const insp100 = elInsp100 ? (parseInt(elInsp100.value) || 0) : 0;
+        
+        let pTls = document.getElementById('pct_def_tls'); 
+        if(pTls) pTls.value = inspTls > 0 ? ((totalSumTls / inspTls) * 100).toFixed(1) + "%" : "0%";
+        
+        let p100 = document.getElementById('pct_def_100');
+        if(p100) p100.value = insp100 > 0 ? ((totalSum100 / insp100) * 100).toFixed(1) + "%" : "0%";
+        
+        let totalInspChart = insp100;
+        let totalDefChart = totalSum100;
+        let totalGoodChart = totalInspChart - totalDefChart;
+        if(totalGoodChart < 0) totalGoodChart = 0;
+
+        let goodPctStr = totalInspChart > 0 ? ((totalGoodChart / totalInspChart) * 100).toFixed(1) + "%" : "0%";
+
+        let cg = document.getElementById('chart_good'); 
+        if(cg) cg.innerText = `${totalGoodChart} (${goodPctStr})`; 
+        
+        let cd = document.getElementById('chart_def'); 
+        if(cd) cd.innerText = totalDefChart; 
+        
+        let pctLabel = document.getElementById('chart_pct');
+        if(pctLabel) {
+            if (totalInspChart === 0) {
+                pctLabel.innerText = "0% DEFECT";
+                pctLabel.style.color = "var(--text-sub)";
+                if(defectChart) {
+                    defectChart.data.datasets[0].data = [1, 0]; 
+                    defectChart.data.datasets[0].backgroundColor = ['#cbd5e1', '#ef4444'];
+                    defectChart.update();
+                }
+            } else {
+                let overAllDefPct = (((totalDefChart) / totalInspChart) * 100).toFixed(1);
+                pctLabel.innerText = overAllDefPct + "% DEFECT"; 
+                pctLabel.style.color = totalDefChart > 0 ? "var(--danger)" : "var(--success)";
+                if(defectChart) {
+                    defectChart.data.datasets[0].data = [totalGoodChart, totalDefChart]; 
+                    defectChart.data.datasets[0].backgroundColor = ['#10b981', '#ef4444'];
+                    defectChart.update();
+                }
+            }
+        }
+        saveData(); 
+    }
+
+    function saveData() { 
+        const data = {}; 
+        document.querySelectorAll('input, select').forEach(input => { 
+            if(input.id && !input.readOnly && !input.id.startsWith('inp_') && !input.id.endsWith('_select')) data[input.id] = input.value; 
+        }); 
+        localStorage.setItem('qcActiveDefects_sew', JSON.stringify(activeDefects));
+        localStorage.setItem('qcAutoSave_sew', JSON.stringify(data)); 
+        localStorage.setItem('qcSavedLine_sew', document.getElementById('line_name').value);
+    }
+    
+    function loadData() { 
+        initDropdowns(); 
+        initChart(); 
+        
+        const saved = JSON.parse(localStorage.getItem('qcAutoSave_sew') || '{}');
+        const activeDefRaw = localStorage.getItem('qcActiveDefects_sew');
+        const savedLine = localStorage.getItem('qcSavedLine_sew');
+
+        if(activeDefRaw && activeDefRaw !== "undefined") {
+            activeDefects = JSON.parse(activeDefRaw); 
+        } else {
+            activeDefects = {};
+        }
+        
+        if(Object.keys(activeDefects).length > 0) { renderDefectList(); }
+        
+        if(saved && Object.keys(saved).length > 0) { 
+            document.querySelectorAll('input, select').forEach(input => { 
+                if(saved[input.id] !== undefined && !input.id.endsWith('_select')) input.value = saved[input.id]; 
+            }); 
+            calculateShiftHours(); calculate(); 
+        } 
+        
+        if(savedLine) {
+            document.getElementById('line_name').value = savedLine;
+            selectedLine = savedLine;
+            updateBuyerDropdown();
+            
+            if(saved['buyer']) {
+                let bs = document.getElementById('buyer_select');
+                let bi = document.getElementById('buyer');
+                let exists = Array.from(bs.options).some(o => o.value === saved['buyer']);
+                if(exists) {
+                    bs.value = saved['buyer'];
+                    bi.value = saved['buyer'];
+                    bi.style.display = 'none';
+                } else {
+                    bs.value = 'MANUAL';
+                    bi.value = saved['buyer'];
+                    bi.style.display = 'block';
+                }
+                updateStyleDropdown();
+                
+                if(saved['style']) {
+                    let ss = document.getElementById('style_select');
+                    let si = document.getElementById('style');
+                    let existsS = Array.from(ss.options).some(o => o.value === saved['style']);
+                    if(existsS) {
+                        ss.value = saved['style'];
+                        si.value = saved['style'];
+                        si.style.display = 'none';
+                    } else {
+                        ss.value = 'MANUAL';
+                        si.value = saved['style'];
+                        si.style.display = 'block';
+                    }
+                }
+            }
+        }
+
+        if(!saved.tanggal) { setDefaultDate(); } 
+        if(localStorage.getItem('darkMode') === 'true') { document.body.classList.add('dark-mode'); document.getElementById('themeBtn').innerText = 'LIGHT';} 
+        checkOfflineBadge();
+    }
+    
+    function resetForm() {
+        Swal.fire({
+            title: 'Hapus Semua Formulir?', text: "Data akan dibersihkan.", icon: 'warning',
+            showCancelButton: true, confirmButtonColor: '#dc2626', cancelButtonColor: '#64748b', confirmButtonText: 'Ya, Bersihkan!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                activeDefects = {}; selectedLine = "";
+                renderDefectList();
+                ['line_name','status','buyer','style','shift_start','shift_end','qty_insp_tls','qty_insp_100','qty_trans','keterangan'].forEach(id => { 
+                    let el = document.getElementById(id);
+                    if(el) el.value = ""; 
+                });
+                
+                let bs = document.getElementById('buyer_select'); if(bs) {bs.innerHTML = '<option value="" disabled selected>-- Pilih Line Dulu --</option>'; bs.style.display='block';}
+                let ss = document.getElementById('style_select'); if(ss) {ss.innerHTML = '<option value="" disabled selected>-- Pilih Buyer Dulu --</option>'; ss.style.display='block';}
+                document.getElementById('buyer').style.display = 'none';
+                document.getElementById('style').style.display = 'none';
+
+                let sh = document.getElementById('shift_hours'); if(sh) sh.innerText = ""; 
+                
+                // Reset Dropdown QC
+                document.getElementById('qc_inline').value = "";
+                document.getElementById('qc_endline').value = "";
+
+                calculate(); saveData();
+                Swal.fire('Bersih!', 'Form sudah di-reset.', 'success');
+            }
+        });
+    }
+
+    // MODIFIKASI: UI/UX Pop-up Tutup Shift (Card Modern & Rapi)
+    function recapSPV() {
+        Swal.fire({
+            title: 'TUTUP SHIFT & REVIEW',
+            html: `
+                <div style="text-align: left; background: var(--bg-section); padding: 15px; border-radius: 8px; border: 1px solid var(--border-line);">
+                    <label style="font-size: 11px; font-weight: 800; color: var(--text-sub);">PASSWORD</label>
+                    <input type="password" id="swal-pass" class="swal2-input" placeholder="Masukkan Password" style="margin: 5px 0 15px 0; width: 100%; height: 45px; font-size:14px; box-sizing:border-box;">
+                    
+                    <label style="font-size: 11px; font-weight: 800; color: var(--text-sub);">TARGET REVIEW (%)</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px;">
+                        <div>
+                            <span style="font-size: 10px; color: var(--danger); font-weight:bold;">MINIMUM</span>
+                            <input type="number" id="swal-min" class="swal2-input" placeholder="Cth: 7.5" step="0.1" style="margin: 0; width: 100%; height: 45px; text-align:center; font-weight:bold; color:var(--text-brand);">
+                        </div>
+                        <div>
+                            <span style="font-size: 10px; color: var(--primary); font-weight:bold;">MAXIMUM</span>
+                            <input type="number" id="swal-max" class="swal2-input" placeholder="Cth: 8.2" step="0.1" style="margin: 0; width: 100%; height: 45px; text-align:center; font-weight:bold; color:var(--text-brand);">
+                        </div>
+                    </div>
+                    <div style="font-size: 10.5px; color: var(--text-sub); margin-top: 15px; line-height:1.4;">
+                        <i></i>
+                    </div>
+                </div>
+            `,
+            customClass: { popup: 'swal-custom-popup' },
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonColor: '#0f172a',
+            confirmButtonText: 'PROSES DATA',
+            cancelButtonText: 'BATAL',
+            preConfirm: () => {
+                const pass = document.getElementById('swal-pass').value;
+                const min = document.getElementById('swal-min').value;
+                const max = document.getElementById('swal-max').value;
+                if (!pass || !min || !max) Swal.showValidationMessage('Isi Password dan Target Min-Max!');
+                if (parseFloat(min) > parseFloat(max)) Swal.showValidationMessage('Min tidak boleh lebih besar dari Max!');
+                return { pass, min, max };
+            }
+        }).then((res) => {
+            if(res.isConfirmed) {
+                if(res.value.pass === 'SEWD1') executeRecap(res.value.min, res.value.max);
+                else Swal.fire('Ditolak', 'Password Salah!', 'error');
+            }
+        });
+    }
+
+    function executeRecap(min, max) {
+        if(!SCRIPT_URL) return;
+        document.getElementById('loading').style.display = 'flex';
+        document.getElementById('loading-text').innerText = "MEMBUAT REVIEW...";
+
+        const payload = { action: "recap", version: APP_VERSION, password: "SEWD1", targetMin: min, targetMax: max };
+
+        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' }})
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('loading').style.display = 'none';
+            if(data.result === "success") Swal.fire('Sukses', 'Dashboard & Review berhasil dibuat.', 'success');
+            else Swal.fire('Error', data.error, 'error'); 
+        }).catch(err => { 
+            document.getElementById('loading').style.display = 'none'; 
+            Swal.fire('Koneksi Gagal', 'Periksa internet.', 'error');
+        });
+    }
+
+    function showSummaryAndSubmit() {
+        const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value : "";
+        
+        const line = getVal('line_name'); 
+        const buyer = getVal('buyer'); 
+        const status = getVal('status');
+        const qcInline = getVal('qc_inline');
+        const qcEndline = getVal('qc_endline');
+
+        const t_tls = parseInt(getVal('tot_def_tls')) || 0; 
+        const t_100 = parseInt(getVal('tot_def_100')) || 0;
+        const i_tls = parseInt(getVal('qty_insp_tls')) || 0; 
+        const i_100 = parseInt(getVal('qty_insp_100')) || 0;
+
+        if((!qcInline || qcInline === "") && (!qcEndline || qcEndline === "")) {
+            Swal.fire('Perhatian', 'Minimal satu Nama QC (Inline / Endline) wajib diisi!', 'warning'); return;
+        }
+
+        if(!line || !buyer || !status) { 
+            Swal.fire('Perhatian', 'Kolom STATUS PRODUKSI, BUYER, dan NAMA LINE wajib diisi!', 'warning'); return; 
+        }
+        if((t_tls > 0 && i_tls === 0) || (t_100 > 0 && i_100 === 0)) { 
+            Swal.fire('Data Tidak Valid', 'Jumlah Defect ada isinya, tapi QTY INSPECT masih KOSONG. Mohon diisi!', 'error'); return; 
+        }
+        if(t_tls > i_tls || t_100 > i_100) { 
+            Swal.fire('Data Tidak Valid', 'Mustahil Jumlah Defect lebih banyak dari Jumlah Baju yang di-Inspect!', 'error'); return; 
+        }
+
+        Swal.fire({
+            title: 'KONFIRMASI REKAP',
+            html: `Pastikan data akhir shift ini benar:<br><br><b>Status:</b> ${status}<br><b>Line:</b> ${line} | <b>Buyer:</b> ${buyer}<br><b>Total Inspect (TLS/100):</b> ${i_tls} / ${i_100}<br><b>Total Defect:</b> <span style="color:red; font-weight:bold;">${t_tls} / ${t_100}</span><br><hr>Apakah sudah sesuai untuk dikirim?`,
+            icon: 'question', showCancelButton: true, confirmButtonColor: '#059669', cancelButtonColor: '#dc2626', confirmButtonText: 'Ya, Kirim Sekarang!', cancelButtonText: 'Cek Lagi'
+        }).then((result) => { if (result.isConfirmed) executeSendToServer(line); });
+    }
+
+    function checkOfflineBadge() {
+        let queue = JSON.parse(localStorage.getItem('qcOfflineQueue') || '[]'); let btnSync = document.getElementById('btnSync');
+        if(queue.length > 0) { btnSync.style.display = 'flex'; btnSync.innerText = `SINKRON (${queue.length})`; } 
+        else { btnSync.style.display = 'none'; }
+    }
+
+    function executeSendToServer(line) {
+        if(!SCRIPT_URL) { fallbackOffline(line, {}); return; }
+
+        let btnSub = document.getElementById('btnSubmitMain');
+        btnSub.disabled = true; btnSub.innerHTML = 'MENGIRIM...';
+        document.getElementById('loading').style.display = 'flex';
+        document.getElementById('loading-text').innerText = "SYNC TO CLOUD...";
+
+        let defectsArray = [];
+        for(let key in activeDefects) {
+            let item = activeDefects[key];
+            defectsArray.push({
+                area: defectAreas[item.aIdx], type: defectTypes[item.tIdx],
+                tls: parseInt(item.tls) || 0, qty100: parseInt(item.qty100) || 0
+            });
+        }
+
+        const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value : "";
+
+        let i_100 = parseInt(getVal('qty_insp_100')) || 0;
+        let t_100 = parseInt(getVal('tot_def_100')) || 0;
+        let qtyProd = i_100 - t_100;
+        if(qtyProd < 0) qtyProd = 0;
+
+        let valInline = getVal('qc_inline');
+        let valEndline = getVal('qc_endline');
+
+        const payload = {
+            action: "submit",
+            version: APP_VERSION,
+            qc_inline: valInline === "-" ? "" : valInline,
+            qc_endline: valEndline === "-" ? "" : valEndline,
+            status: getVal('status'),
+            tanggal: getVal('tanggal'), 
+            line_name: line, 
+            shift_start: getVal('shift_start'), 
+            shift_end: getVal('shift_end'),
+            buyer: getVal('buyer'), 
+            style: getVal('style'),
+            jam_istirahat: getVal('jam_istirahat') || "0",
+            qty_prod: qtyProd, 
+            tot_def_tls: getVal('tot_def_tls') || "0", 
+            tot_def_100: getVal('tot_def_100') || "0",
+            qty_insp_tls: getVal('qty_insp_tls') || "0", 
+            qty_insp_100: getVal('qty_insp_100') || "0",
+            pct_def_tls: getVal('pct_def_tls') || "0%", 
+            pct_def_100: getVal('pct_def_100') || "0%",
+            qty_trans: getVal('qty_trans') || "0",
+            keterangan: getVal('keterangan'), 
+            defects: defectsArray
+        };
+
+        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' }})
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('loading').style.display = 'none'; btnSub.disabled = false; btnSub.innerHTML = 'CONFIRM & SUBMIT';
+            if(data.result === "success") { 
+                Swal.fire('Sukses', 'Data Line ' + line + ' berhasil disinkronisasi ke Dashboard!', 'success').then(() => { 
+                    clearAfterSubmit(); 
+                }); 
+            } else if(data.error === "VERSION_MISMATCH") {
+                Swal.fire('Versi Usang!', 'Aplikasi yang Anda gunakan sudah usang. Silakan minta file HTML versi terbaru ke SPV Anda.', 'error');
+            } else { 
+                Swal.fire('Error', 'Gagal dari server: ' + data.error, 'error'); 
+            }
+        }).catch(err => { 
+            document.getElementById('loading').style.display = 'none'; btnSub.disabled = false; btnSub.innerHTML = 'CONFIRM & SUBMIT';
+            fallbackOffline(line, payload);
+        });
+    }
+
+    function fallbackOffline(line, payload) {
+        let queue = JSON.parse(localStorage.getItem('qcOfflineQueue') || '[]'); queue.push({ payload: payload, lineName: line }); localStorage.setItem('qcOfflineQueue', JSON.stringify(queue));
+        Swal.fire('Sistem Offline', 'Internet terputus. Data tersimpan di HP. Ketuk tombol SINKRON nanti saat sinyal bagus.', 'info');
+        checkOfflineBadge(); clearAfterSubmit();
+    }
+
+    function clearAfterSubmit() {
+        activeDefects = {}; renderDefectList();
+        ['line_name','status','buyer','style','shift_start','shift_end','qty_insp_tls','qty_insp_100','qty_trans','keterangan'].forEach(id => { 
+            let el = document.getElementById(id);
+            if(el) el.value = ""; 
+        });
+        
+        let bs = document.getElementById('buyer_select'); if(bs) {bs.innerHTML = '<option value="" disabled selected>-- Pilih Line Dulu --</option>'; bs.style.display='block';}
+        let ss = document.getElementById('style_select'); if(ss) {ss.innerHTML = '<option value="" disabled selected>-- Pilih Buyer Dulu --</option>'; ss.style.display='block';}
+        document.getElementById('buyer').style.display = 'none';
+        document.getElementById('style').style.display = 'none';
+
+        selectedLine = "";
+        let sh = document.getElementById('shift_hours'); if(sh) sh.innerText = "";
+        calculate(); saveData();
+    }
+
+    function pushOfflineData() {
+        let queue = JSON.parse(localStorage.getItem('qcOfflineQueue') || '[]'); if(queue.length === 0) return;
+        document.getElementById('loading').style.display = 'flex'; document.getElementById('loading-text').innerText = "MENYINKRONKAN DATA OFFLINE...";
+        
+        let item = queue[0]; 
+        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(item.payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' }})
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('loading').style.display = 'none';
+            if(data.result === "success") { 
+                queue.shift(); localStorage.setItem('qcOfflineQueue', JSON.stringify(queue));
+                Swal.fire('Sukses', `Data Line ${item.lineName} berhasil dikirim!`, 'success'); checkOfflineBadge();
+                if(queue.length > 0) pushOfflineData(); 
+            } else if(data.error === "VERSION_MISMATCH") {
+                Swal.fire('Versi Usang!', 'Aplikasi usang. Hapus antrean ini dan gunakan aplikasi terbaru.', 'error');
+            } else { Swal.fire('Gagal', 'Coba lagi nanti.', 'error'); }
+        }).catch(err => { document.getElementById('loading').style.display = 'none'; Swal.fire('Koneksi Buruk', 'Masih belum ada internet.', 'warning'); });
+    }
+
+    async function exportToExcel() {
+        const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value : "";
+        
+        const lineName = getVal('line_name');
+        const shiftStart = getVal('shift_start');
+        const shiftEnd = getVal('shift_end');
+        const jamIstirahat = getVal('jam_istirahat') || "0";
+        const status = getVal('status');
+        
+        let shiftStr = shiftStart && shiftEnd ? `${shiftStart} - ${shiftEnd}` : "";
+        if(shiftStart && shiftEnd) {
+            let t1 = shiftStart.split(":"); let t2 = shiftEnd.split(":");
+            let d1 = new Date(2000, 0, 1, parseInt(t1[0],10), parseInt(t1[1],10)); 
+            let d2 = new Date(2000, 0, 1, parseInt(t2[0],10), parseInt(t2[1],10));
+            if(d2 < d1) d2.setDate(d2.getDate() + 1); 
+            let diff = (d2 - d1) / (1000 * 60 * 60);
+            let hours = Math.floor(diff); let mins = Math.round((diff % 1) * 60);
+            shiftStr += ` (${hours} Jam${mins > 0 ? ' ' + mins + ' Menit' : ''})`;
+        }
+
+        const buyer = getVal('buyer'); 
+        const style = getVal('style');
+        const dateInput = getVal('tanggal'); 
+        
+        const vInline = getVal('qc_inline'); const vEndline = getVal('qc_endline');
+        const nmIn = (vInline && vInline !== "-") ? vInline : "";
+        const nmEn = (vEndline && vEndline !== "-") ? vEndline : "";
+
+        const displayDate = dateInput ? dateInput.split('-').reverse().join('/') : ""; 
+        const dateStr = dateInput ? dateInput.split('-').reverse().join('-') : 'Hari_ini';
+
+        const workbook = new ExcelJS.Workbook(); 
+        const sheet = workbook.addWorksheet("QC Line Report", { views: [{ showGridLines: false }] });
+        
+        sheet.getColumn('A').width = 6;  
+        sheet.getColumn('B').width = 30; 
+        sheet.getColumn('C').width = 25; 
+        sheet.getColumn('D').width = 15; 
+        sheet.getColumn('E').width = 15; 
+        
+        sheet.addRow(["LINE", "", "", lineName, ""]); sheet.mergeCells('A1:C1'); sheet.mergeCells('D1:E1');
+        sheet.addRow(["SHIFT", "", "", shiftStr, ""]); sheet.mergeCells('A2:C2'); sheet.mergeCells('D2:E2');
+        sheet.addRow(["TANGGAL", "", "", displayDate, ""]); sheet.mergeCells('A3:C3'); sheet.mergeCells('D3:E3');
+        sheet.addRow(["ORDER/BUYER", "", "", buyer, ""]); sheet.mergeCells('A4:C4'); sheet.mergeCells('D4:E4');
+        sheet.addRow(["STYLE", "", "", style, ""]); sheet.mergeCells('A5:C5'); sheet.mergeCells('D5:E5');
+        sheet.addRow(["STATUS", "", "", status, ""]); sheet.mergeCells('A6:C6'); sheet.mergeCells('D6:E6');
+        sheet.addRow(["ISTIRAHAT (Mnt)", "", "", jamIstirahat, ""]); sheet.mergeCells('A7:C7'); sheet.mergeCells('D7:E7');
+        sheet.addRow(["QTY.DEFECT", "", "", getVal('tot_def_tls'), getVal('tot_def_100')]); sheet.mergeCells('A8:C8');
+        sheet.addRow(["QTY.INSPECT", "", "", getVal('qty_insp_tls'), getVal('qty_insp_100')]); sheet.mergeCells('A9:C9');
+        sheet.addRow(["% DEFECT", "", "", getVal('pct_def_tls'), getVal('pct_def_100')]); sheet.mergeCells('A10:C10');
+        sheet.addRow(["QTY.TRANSFER", "", "", getVal('qty_trans'), ""]); sheet.mergeCells('A11:C11'); sheet.mergeCells('D11:E11');
+        sheet.addRow(["REASON", "", "", getVal('keterangan'), ""]); sheet.mergeCells('A12:C12'); sheet.mergeCells('D12:E12');
+        sheet.addRow(["INSPECTOR", "", "", nmIn, nmEn]); sheet.mergeCells('A13:C13');
+        
+        sheet.addRow(["NO", "AREA", "JENIS DEFECT", "TLS", "100%"]);
+        
+        let startRow = 15; 
+        for (let a = 0; a < defectAreas.length; a++) {
+            let mergeStart = startRow;
+            for (let t = 0; t < defectTypes.length; t++) {
+                let nomor = (t === 0) ? (a + 1) : ""; 
+                let aName = (t === 0) ? defectAreas[a] : ""; 
+                let tName = defectTypes[t];
+                
+                let key = `${a}_${t}`;
+                let vTls = ""; let v100 = "";
+                if(activeDefects[key]) {
+                    vTls = activeDefects[key].tls || "";
+                    v100 = activeDefects[key].qty100 || "";
+                }
+                
+                sheet.addRow([nomor, aName, tName, vTls, v100]);
+                startRow++;
+            }
+            sheet.mergeCells(`A${mergeStart}:A${startRow - 1}`);
+            sheet.mergeCells(`B${mergeStart}:B${startRow - 1}`);
+        }
+
+        const blackFont = { name: 'Times New Roman', size: 11, color: { argb: 'FF000000' }, bold: true };
+        const borderStyle = { top: { style: 'thin', color: { argb: 'FF000000' } }, left: { style: 'thin', color: { argb: 'FF000000' } }, bottom: { style: 'thin', color: { argb: 'FF000000' } }, right: { style: 'thin', color: { argb: 'FF000000' } } };
+        const greyFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE5E7EB' } }; 
+        const whiteFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
+
+        sheet.eachRow((row, rowNumber) => {
+            row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                if(colNumber <= 5) {
+                    cell.font = blackFont; 
+                    cell.border = borderStyle; 
+                    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                    
+                    if(rowNumber <= 13) { 
+                        if(colNumber === 1) { 
+                            cell.fill = greyFill; 
+                            cell.alignment = { vertical: 'middle', horizontal: 'left' }; 
+                        } else if (colNumber === 4 || colNumber === 5) {
+                            cell.fill = whiteFill;
+                        }
+                    } else if (rowNumber === 14) { 
+                        cell.fill = greyFill; 
+                    } else {
+                        if(colNumber === 1) cell.fill = greyFill;
+                        else if (colNumber === 2 || colNumber === 3) { 
+                            cell.fill = greyFill; 
+                            cell.alignment = { vertical: 'middle', horizontal: 'left' }; 
+                        } else {
+                            cell.fill = whiteFill;
+                        }
+                    }
+                }
+            });
+        });
+
+        const buffer = await workbook.xlsx.writeBuffer(); 
+        saveAs(new Blob([buffer]), `QC_Line_${lineName || 'Offline'}_${dateStr}.xlsx`);
+    }
+
+    window.onload = loadData;
+</script>
+</body>
+</html>
