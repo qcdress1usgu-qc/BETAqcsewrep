@@ -49,12 +49,13 @@
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
         .card { background: var(--bg-card); border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-line); }
         
-        /* INPUTS & GRID YAG SIMETRIS */
+        /* INPUTS & GRID YANG SIMETRIS */
         .input-group { margin-bottom: 16px; position: relative; }
         label { display: block; font-size: 11px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
         .req::after { content: " *"; color: var(--danger); font-size: 14px;}
         
-        input, textarea, select { width: 100%; height: 45px; padding: 0 12px; border: 1px solid var(--border-line); border-radius: 6px; box-sizing: border-box; font-size: 14px; font-weight: 600; background: var(--bg-input); color: var(--text-main); font-family: inherit;}
+        /* Modifikasi untuk mencegah input/select memanjang sendiri dan merusak grid */
+        input, textarea, select { width: 100%; height: 45px; padding: 0 12px; border: 1px solid var(--border-line); border-radius: 6px; box-sizing: border-box; font-size: 14px; font-weight: 600; background: var(--bg-input); color: var(--text-main); font-family: inherit; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
         input:focus, textarea:focus, select:focus { border-color: var(--border-focus); outline: none; box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15); }
         
         input[readonly].clickable { cursor: pointer; background: var(--bg-input); border-style: solid; color: var(--primary); text-align: center; font-size: 16px; }
@@ -63,6 +64,9 @@
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .responsive-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .dual-input { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        /* KUNCI PENTING: Mencegah grid jebol saat ada teks nama yang sangat panjang */
+        .grid > *, .responsive-grid > *, .dual-input > * { min-width: 0; }
 
         @media (max-width: 600px) {
             .grid { grid-template-columns: 1fr; gap: 15px; }
@@ -70,7 +74,7 @@
         }
         
         .shift-container { display: flex; align-items: center; gap: 10px; }
-        .shift-container input[type="time"] { flex: 1; text-align: center; }
+        .shift-container input[type="time"] { flex: 1; text-align: center; padding: 0; }
         .shift-divider { font-weight: 900; color: var(--text-sub); }
 
         .btn-add { background: var(--primary); color: white; border: none; height: 45px; border-radius: 6px; font-weight: 800; cursor: pointer; width: 100%; font-size: 13px; letter-spacing: 0.5px; box-shadow: var(--shadow-sm);}
@@ -83,7 +87,7 @@
         .btn-del { background: var(--bg-card); color: var(--danger); border: 1px solid var(--danger); border-radius: 6px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 900; font-size: 12px;}
 
         .flex-inputs { display: flex; gap: 10px; width: 100%; }
-        .stepper { display: flex; align-items: center; background: var(--bg-card); border: 1px solid var(--border-line); border-radius: 6px; overflow: hidden; flex: 1; height: 45px;}
+        .stepper { display: flex; align-items: center; background: var(--bg-card); border: 1px solid var(--border-line); border-radius: 6px; overflow: hidden; flex: 1; height: 45px; min-width: 0; }
         .stepper button { background: var(--bg-stepper); border: none; width: 45px; height: 100%; font-size: 20px; font-weight: bold; color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .stepper input { flex: 1; min-width: 0; border: none; text-align: center; font-weight: 900; padding: 0; height: 100%; color: var(--text-brand); background: transparent; }
         .stepper input::placeholder { color: var(--text-sub); font-weight: bold; opacity: 0.7; }
@@ -161,9 +165,9 @@
                 <select id="qc_inline" onchange="saveData()"></select>
                 <select id="qc_endline" onchange="saveData()"></select>
             </div>
-            <div style="display:flex; font-size:10px; color:var(--text-sub); margin-top:6px; font-weight:bold;">
-                <span style="flex:1; text-align:center;">(INLINE)</span>
-                <span style="flex:1; text-align:center;">(ENDLINE)</span>
+            <div class="dual-input" style="font-size:10px; color:var(--text-sub); margin-top:6px; font-weight:bold; text-align:center;">
+                <span>(INLINE)</span>
+                <span>(ENDLINE)</span>
             </div>
         </div>
         
@@ -407,7 +411,6 @@
 
     let activeDefects = {}; 
 
-    // MODIFIKASI: Tombol Tema Emoji (Matahari / Bulan)
     function toggleTheme() { 
         document.body.classList.toggle('dark-mode'); 
         const isDark = document.body.classList.contains('dark-mode');
@@ -696,13 +699,11 @@
         
         let pTls = document.getElementById('pct_def_tls'); 
         if(pTls) {
-            // MODIFIKASI: Menggunakan javascript ternary division murni tanpa error output
             pTls.value = inspTls > 0 ? ((totalSumTls / inspTls) * 100).toFixed(1) + "%" : "0%";
         }
         
         let p100 = document.getElementById('pct_def_100');
         if(p100) {
-            // MODIFIKASI: Menggunakan javascript ternary division murni tanpa error output
             p100.value = insp100 > 0 ? ((totalSum100 / insp100) * 100).toFixed(1) + "%" : "0%";
         }
         
@@ -814,7 +815,6 @@
         }
 
         if(!saved.tanggal) { setDefaultDate(); } 
-        // MODIFIKASI: Memastikan Emoji benar saat pertama kali dimuat
         if(localStorage.getItem('darkMode') === 'true') { 
             document.body.classList.add('dark-mode'); 
             document.getElementById('themeBtn').innerText = '☀️';
