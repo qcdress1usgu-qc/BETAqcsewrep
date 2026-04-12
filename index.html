@@ -49,33 +49,37 @@
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
         .card { background: var(--bg-card); border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-line); }
         
-        /* INPUTS & GRID YANG SIMETRIS */
-        .input-group { margin-bottom: 16px; position: relative; }
-        label { display: block; font-size: 11px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+        /* KANAN KIRI & SIMETRIS CSS */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 12px; align-items: stretch; margin-bottom: 16px; }
+        .input-group { display: flex; flex-direction: column; justify-content: flex-end; min-width: 0; height: 100%; margin-bottom: 16px; position: relative; }
+        .grid .input-group { margin-bottom: 0; } 
+        
+        label { display: block; font-size: 10.5px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.2px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .req::after { content: " *"; color: var(--danger); font-size: 14px;}
         
-        /* Modifikasi untuk mencegah input/select memanjang sendiri dan merusak grid */
-        input, textarea, select { width: 100%; height: 45px; padding: 0 12px; border: 1px solid var(--border-line); border-radius: 6px; box-sizing: border-box; font-size: 14px; font-weight: 600; background: var(--bg-input); color: var(--text-main); font-family: inherit; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+        input, textarea, select { width: 100%; height: 45px; padding: 0 10px; border: 1px solid var(--border-line); border-radius: 6px; box-sizing: border-box; font-size: 13.5px; font-weight: 600; background: var(--bg-input); color: var(--text-main); font-family: inherit; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; min-width: 0; }
         input:focus, textarea:focus, select:focus { border-color: var(--border-focus); outline: none; box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15); }
         
-        input[readonly].clickable { cursor: pointer; background: var(--bg-input); border-style: solid; color: var(--primary); text-align: center; font-size: 16px; }
+        input[readonly].clickable { cursor: pointer; background: var(--bg-input); border-style: solid; color: var(--primary); text-align: center; font-size: 15px; }
         input[readonly]:not(.clickable) { background: var(--bg-readonly); font-weight: bold; color: var(--danger); cursor: not-allowed; border-style: dashed; }
         
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .responsive-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .dual-input { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        
-        /* KUNCI PENTING: Mencegah grid jebol saat ada teks nama yang sangat panjang */
-        .grid > *, .responsive-grid > *, .dual-input > * { min-width: 0; }
-
-        @media (max-width: 600px) {
-            .grid { grid-template-columns: 1fr; gap: 15px; }
-            .responsive-grid { grid-template-columns: 1fr; gap: 15px; }
-        }
+        .dual-input { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; min-width: 0;}
         
         .shift-container { display: flex; align-items: center; gap: 10px; }
         .shift-container input[type="time"] { flex: 1; text-align: center; padding: 0; }
         .shift-divider { font-weight: 900; color: var(--text-sub); }
+
+        /* RESPONSIVE UNTUK HP */
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr 1fr; gap: 14px 10px; } 
+            .dual-input { gap: 6px; }
+            input, textarea, select { padding: 0 6px; font-size: 12px; height: 42px; }
+            label { font-size: 9.5px; margin-bottom: 6px; }
+            .card { padding: 15px; }
+            .stepper { height: 42px !important; }
+            .btn-add { height: 42px !important; font-size: 12px; }
+            .shift-container { gap: 6px; }
+        }
 
         .btn-add { background: var(--primary); color: white; border: none; height: 45px; border-radius: 6px; font-weight: 800; cursor: pointer; width: 100%; font-size: 13px; letter-spacing: 0.5px; box-shadow: var(--shadow-sm);}
         .empty-state { text-align: center; padding: 25px 20px; color: var(--text-sub); font-size: 12px; font-weight: bold; border: 2px dashed var(--border-line); border-radius: 8px; background: var(--bg-section); line-height: 1.6;}
@@ -151,7 +155,7 @@
     <div class="header-content">
         <div class="title-area">
             <div class="main-title">QC SEWING DASHBOARD</div>
-            <div class="sub-title">QUALITY ENGINEERING USGU DRESS 1 <span class="version-badge" id="verBadge">v1.2-REV</span></div>
+            <div class="sub-title">USGU DRESS 1 <span class="version-badge" id="verBadge">v1.2-REV</span></div>
         </div>
         <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" title="Ganti Tema">🌙</button>
     </div>
@@ -182,7 +186,10 @@
                 </select>
             </div>
             
-            <div class="input-group"><label class="req">TANGGAL:</label><input type="date" id="tanggal" onchange="saveData()"></div>
+            <div class="input-group">
+                <label class="req">TANGGAL:</label>
+                <input type="date" id="tanggal" onchange="saveData()">
+            </div>
             
             <div class="input-group">
                 <label>JAM ISTIRAHAT:</label>
@@ -215,7 +222,7 @@
                 <input type="text" id="style" placeholder="Cth: 450211" style="display:none; margin-top:8px;" oninput="formatStyleInput(this)">
             </div>
             
-            <div class="input-group" style="grid-column: span 2;">
+            <div class="input-group" style="grid-column: 1 / -1;">
                 <label class="req">SHIFT: <span id="shift_hours" style="color:var(--primary); font-weight:900;"></span></label>
                 <div class="shift-container">
                     <input type="time" id="shift_start" oninput="calculateShiftHours(); saveData()">
@@ -274,35 +281,35 @@
             </div>
         </div>
 
-        <div class="responsive-grid">
-            <div class="input-group" style="margin-bottom:0;">
+        <div class="grid">
+            <div class="input-group">
                 <label style="color:var(--danger);">QTY.DEFECT (TLS | 100%):</label>
                 <div class="dual-input">
                     <input type="number" id="tot_def_tls" readonly value="0" placeholder="TLS">
                     <input type="number" id="tot_def_100" readonly value="0" placeholder="100%">
                 </div>
             </div>
-            <div class="input-group" style="margin-bottom:0;">
+            <div class="input-group">
                 <label class="req">QTY.INSPECT (TLS | 100%):</label>
                 <div class="dual-input">
                     <input type="number" id="qty_insp_tls" oninput="formatAntiMinus(this); calculate()" placeholder="Insp TLS">
                     <input type="number" id="qty_insp_100" oninput="formatAntiMinus(this); calculate()" placeholder="Insp 100%">
                 </div>
             </div>
-            <div class="input-group" style="margin-bottom:0;">
+            <div class="input-group">
                 <label style="color:var(--danger);">% DEFECT (TLS | 100%):</label>
                 <div class="dual-input">
                     <input type="text" id="pct_def_tls" readonly value="0%" placeholder="TLS">
                     <input type="text" id="pct_def_100" readonly value="0%" placeholder="100%">
                 </div>
             </div>
-            <div class="input-group" style="margin-bottom:0;">
+            <div class="input-group">
                 <label>TRANSFER:</label>
                 <input type="number" id="qty_trans" oninput="formatAntiMinus(this); saveData()" placeholder="0">
             </div>
         </div>
         
-        <div class="input-group" style="margin-top: 14px;">
+        <div class="input-group" style="margin-top: 5px; grid-column: 1 / -1; width: 100%;">
             <label>KETERANGAN:</label>
             <input type="text" id="keterangan" placeholder="Isi Note..." oninput="saveData()">
         </div>
@@ -352,7 +359,6 @@
         "10", "11", "12", "13", "14", "15", "16", "16A", "16B", "17A", "17B", "18", "19A", "19B", "20", "21", "MINILINE"
     ];
     
-    // LIST QC YANG AKAN MASUK KE DROPDOWN
     const listQC = [
         "Afifah Maulidina", "Agsagita Cita A", "Ajeng Fitriani", "Alfina Damayanti", "Alfina Putri SP",
         "Anik Anastia", "Anis Nuraeni", "Antri Parela", "Ariella Alma", "Astrid Ayu P", "Bella",
