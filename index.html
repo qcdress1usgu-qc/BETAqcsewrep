@@ -140,7 +140,7 @@
     <div class="header-content">
         <div class="title-area">
             <div class="main-title">QC SEWING DASHBOARD</div>
-            <div class="sub-title">QUALITY ENGINEERING USGU DRESS 1 <span class="version-badge" id="verBadge">v1.2-REV</span></div>
+            <div class="sub-title">USGU DRESS 1 <span class="version-badge" id="verBadge">v1.2-REV</span></div>
         </div>
         <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">DARK</button>
     </div>
@@ -834,16 +834,42 @@
         });
     }
 
-    // MODIFIKASI: UI/UX Pop-up Tutup Shift (Card Modern & Rapi)
+    // MODIFIKASI: UI/UX Pop-up Tutup Shift (2 Tahap Keamanan)
     function recapSPV() {
+        // TAHAP 1: Minta Password Saja (Tampilan Polos)
         Swal.fire({
-            title: 'TUTUP SHIFT & REVIEW',
+            title: 'TUTUP SHIFT',
+            text: 'Masukkan Kode Akses SPV untuk merekap data hari ini:',
+            input: 'password',
+            inputPlaceholder: 'Ketik Password...',
+            inputAttributes: {
+                autocapitalize: 'off',
+                autocorrect: 'off'
+            },
+            showCancelButton: true,
+            confirmButtonColor: '#0f172a',
+            confirmButtonText: 'VERIFIKASI',
+            cancelButtonText: 'BATAL'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Validasi Password
+                if (result.value === 'SEWD1') {
+                    // Jika Benar, Buka Menu Rahasia
+                    showReviewMenu();
+                } else {
+                    Swal.fire('Akses Ditolak', 'Password Salah!', 'error');
+                }
+            }
+        });
+    }
+
+    // TAHAP 2: Menu Rahasia Target Review (Hanya muncul jika password benar)
+    function showReviewMenu() {
+        Swal.fire({
+            title: '⚙️ TARGET LAPORAN REVIEW',
             html: `
                 <div style="text-align: left; background: var(--bg-section); padding: 15px; border-radius: 8px; border: 1px solid var(--border-line);">
-                    <label style="font-size: 11px; font-weight: 800; color: var(--text-sub);">PASSWORD</label>
-                    <input type="password" id="swal-pass" class="swal2-input" placeholder="Masukkan Password" style="margin: 5px 0 15px 0; width: 100%; height: 45px; font-size:14px; box-sizing:border-box;">
-                    
-                    <label style="font-size: 11px; font-weight: 800; color: var(--text-sub);">TARGET REVIEW (%)</label>
+                    <label style="font-size: 11px; font-weight: 800; color: var(--text-sub);">📊 TARGET RATE DEFECT (%)</label>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px;">
                         <div>
                             <span style="font-size: 10px; color: var(--danger); font-weight:bold;">MINIMUM</span>
@@ -855,7 +881,7 @@
                         </div>
                     </div>
                     <div style="font-size: 10.5px; color: var(--text-sub); margin-top: 15px; line-height:1.4;">
-                        <i></i>
+                        <i>*Sistem akan menyamarkan angka defect aktual secara acak dan proporsional untuk mencapai target laporan.</i>
                     </div>
                 </div>
             `,
@@ -866,17 +892,15 @@
             confirmButtonText: 'PROSES DATA',
             cancelButtonText: 'BATAL',
             preConfirm: () => {
-                const pass = document.getElementById('swal-pass').value;
                 const min = document.getElementById('swal-min').value;
                 const max = document.getElementById('swal-max').value;
-                if (!pass || !min || !max) Swal.showValidationMessage('Isi Password dan Target Min-Max!');
+                if (!min || !max) Swal.showValidationMessage('Isi Target Min dan Max!');
                 if (parseFloat(min) > parseFloat(max)) Swal.showValidationMessage('Min tidak boleh lebih besar dari Max!');
-                return { pass, min, max };
+                return { min, max };
             }
         }).then((res) => {
             if(res.isConfirmed) {
-                if(res.value.pass === 'SEWD1') executeRecap(res.value.min, res.value.max);
-                else Swal.fire('Ditolak', 'Password Salah!', 'error');
+                executeRecap(res.value.min, res.value.max);
             }
         });
     }
