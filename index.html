@@ -33,51 +33,59 @@
         input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
 
-        .header { background: var(--bg-card); border-bottom: 3px solid var(--primary); box-shadow: var(--shadow-md); padding: 20px 15px; transition: background-color 0.3s; }
+        /* HEADER */
+        .header { background: var(--bg-card); border-bottom: 3px solid var(--primary); box-shadow: var(--shadow-md); padding: 18px 15px; transition: background-color 0.3s; }
         .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 800px; margin: 0 auto; }
-        .title-area { display: flex; flex-direction: column; cursor: pointer; }
+        .title-area { display: flex; flex-direction: column; }
         .main-title { font-weight: 900; color: var(--text-brand); font-size: 1.3rem; letter-spacing: 1px; }
-        .sub-title { font-size: 10px; color: var(--text-sub); font-weight: bold; letter-spacing: 1.5px; margin-top: 4px; }
-        .version-badge { background: var(--primary); color: white; padding: 2px 6px; border-radius: 4px; font-size: 9px; margin-left: 6px; font-weight: 900;}
-        .theme-toggle { background: var(--bg-body); border: 1px solid var(--border-line); color: var(--text-main); border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 800; display: flex; justify-content: center; align-items: center; cursor: pointer; outline: none; box-shadow: var(--shadow-sm); transition: all 0.2s; letter-spacing: 1px;}
+        .sub-title { font-size: 10px; color: var(--text-sub); font-weight: bold; letter-spacing: 1.5px; margin-top: 4px; display: flex; align-items: center; gap: 6px;}
+        .version-badge { background: var(--primary); color: white; padding: 3px 6px; border-radius: 4px; font-size: 9px; font-weight: 900;}
+        
+        /* THEME TOGGLE (EMOJI SIMETRIS) */
+        .theme-toggle { background: var(--bg-body); border: 1px solid var(--border-line); border-radius: 50%; width: 40px; height: 40px; font-size: 18px; display: flex; justify-content: center; align-items: center; cursor: pointer; outline: none; box-shadow: var(--shadow-sm); transition: all 0.2s;}
+        .theme-toggle:hover { transform: scale(1.05); }
+        .theme-toggle:active { transform: scale(0.95); }
         
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
         .card { background: var(--bg-card); border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-line); }
+        
+        /* INPUTS & GRID YAG SIMETRIS */
         .input-group { margin-bottom: 16px; position: relative; }
         label { display: block; font-size: 11px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
         .req::after { content: " *"; color: var(--danger); font-size: 14px;}
-        input, textarea, select { width: 100%; padding: 14px 12px; border: 1px solid var(--border-line); border-radius: 6px; box-sizing: border-box; font-size: 14px; font-weight: 600; background: var(--bg-input); color: var(--text-main); font-family: inherit;}
+        
+        input, textarea, select { width: 100%; height: 45px; padding: 0 12px; border: 1px solid var(--border-line); border-radius: 6px; box-sizing: border-box; font-size: 14px; font-weight: 600; background: var(--bg-input); color: var(--text-main); font-family: inherit;}
         input:focus, textarea:focus, select:focus { border-color: var(--border-focus); outline: none; box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15); }
         
         input[readonly].clickable { cursor: pointer; background: var(--bg-input); border-style: solid; color: var(--primary); text-align: center; font-size: 16px; }
         input[readonly]:not(.clickable) { background: var(--bg-readonly); font-weight: bold; color: var(--danger); cursor: not-allowed; border-style: dashed; }
         
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .responsive-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .responsive-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .dual-input { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         @media (max-width: 600px) {
-            .grid { grid-template-columns: 1fr; gap: 12px; }
-            .responsive-grid { grid-template-columns: 1fr; gap: 12px; }
+            .grid { grid-template-columns: 1fr; gap: 15px; }
+            .responsive-grid { grid-template-columns: 1fr; gap: 15px; }
         }
         
-        .shift-container { display: flex; align-items: center; gap: 8px; }
-        .shift-container input[type="time"] { flex: 1; padding: 12px 10px; text-align: center; }
+        .shift-container { display: flex; align-items: center; gap: 10px; }
+        .shift-container input[type="time"] { flex: 1; text-align: center; }
         .shift-divider { font-weight: 900; color: var(--text-sub); }
 
-        .btn-add { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: 800; cursor: pointer; width: 100%; font-size: 13px; letter-spacing: 0.5px; box-shadow: var(--shadow-sm);}
-        .empty-state { text-align: center; padding: 20px; color: var(--text-sub); font-size: 12px; font-weight: bold; border: 2px dashed var(--border-line); border-radius: 8px; background: var(--bg-section);}
+        .btn-add { background: var(--primary); color: white; border: none; height: 45px; border-radius: 6px; font-weight: 800; cursor: pointer; width: 100%; font-size: 13px; letter-spacing: 0.5px; box-shadow: var(--shadow-sm);}
+        .empty-state { text-align: center; padding: 25px 20px; color: var(--text-sub); font-size: 12px; font-weight: bold; border: 2px dashed var(--border-line); border-radius: 8px; background: var(--bg-section); line-height: 1.6;}
         
         .summary-card { background: var(--bg-section); border: 1px solid var(--border-line); border-radius: 8px; padding: 15px; margin-bottom: 12px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 12px;}
         .summary-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border-line); padding-bottom: 10px; }
         .summary-title { font-size: 14px; font-weight: 900; color: var(--primary); display: flex; flex-direction: column;}
-        .summary-subtitle { font-size: 11px; color: var(--text-main); font-weight: 700; margin-top: 3px; letter-spacing: 0.5px;}
+        .summary-subtitle { font-size: 11px; color: var(--text-main); font-weight: 700; margin-top: 4px; letter-spacing: 0.5px;}
         .btn-del { background: var(--bg-card); color: var(--danger); border: 1px solid var(--danger); border-radius: 6px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 900; font-size: 12px;}
 
-        .flex-inputs { display: flex; gap: 12px; width: 100%; }
-        .stepper { display: flex; align-items: center; background: var(--bg-card); border: 1px solid var(--border-line); border-radius: 6px; overflow: hidden; flex: 1; }
-        .stepper button { background: var(--bg-stepper); border: none; width: 45px; height: 40px; font-size: 20px; font-weight: bold; color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .stepper input { flex: 1; min-width: 0; border: none; text-align: center; font-weight: 900; padding: 0; height: 40px; color: var(--text-brand); background: transparent; }
+        .flex-inputs { display: flex; gap: 10px; width: 100%; }
+        .stepper { display: flex; align-items: center; background: var(--bg-card); border: 1px solid var(--border-line); border-radius: 6px; overflow: hidden; flex: 1; height: 45px;}
+        .stepper button { background: var(--bg-stepper); border: none; width: 45px; height: 100%; font-size: 20px; font-weight: bold; color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .stepper input { flex: 1; min-width: 0; border: none; text-align: center; font-weight: 900; padding: 0; height: 100%; color: var(--text-brand); background: transparent; }
         .stepper input::placeholder { color: var(--text-sub); font-weight: bold; opacity: 0.7; }
         .stepper input:focus { box-shadow: none; }
 
@@ -86,8 +94,8 @@
 
         .action-buttons { position: fixed; bottom: 15px; left: 15px; right: 15px; max-width: 770px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
         .row-btns { display: flex; gap: 10px; }
-        .btn-action { flex: 1; border: none; padding: 12px 5px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 12px; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.5px;}
-        .btn-server { background: var(--primary-grad); box-shadow: var(--shadow-btn); font-size: 14px; width: 100%; padding: 14px;}
+        .btn-action { flex: 1; border: none; height: 48px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 12px; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.5px;}
+        .btn-server { background: var(--primary-grad); box-shadow: var(--shadow-btn); font-size: 14px;}
         .btn-xl { background: var(--bg-card); color: var(--text-brand); border: 1px solid var(--border-line); box-shadow: var(--shadow-sm);}
         .btn-reset { background: var(--bg-card); color: var(--danger); border: 1px solid var(--danger); box-shadow: var(--shadow-sm);}
         .btn-spv { background: #1e293b; color: #f8fafc; border: 1px solid #0f172a; box-shadow: var(--shadow-sm);}
@@ -108,15 +116,14 @@
         .modal-box { background: var(--bg-card); width: 95%; max-width: 450px; border-radius: 12px; padding: 20px; box-shadow: var(--shadow-md); display: flex; flex-direction: column; gap: 15px; max-height: 90vh; overflow-y: auto;}
         .modal-title { font-weight: 900; color: var(--primary); font-size: 16px; text-align: center; border-bottom: 2px solid var(--border-line); padding-bottom: 10px;}
         
-        .grid-line-selection { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .line-btn { background: var(--bg-section); border: 1px solid var(--border-line); padding: 12px 5px; border-radius: 8px; font-weight: 900; color: var(--text-main); cursor: pointer; font-size: 13px; text-align: center; transition: all 0.2s; }
+        .grid-line-selection { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .line-btn { background: var(--bg-section); border: 1px solid var(--border-line); height: 45px; border-radius: 8px; font-weight: 900; color: var(--text-main); cursor: pointer; font-size: 13px; transition: all 0.2s; display: flex; align-items: center; justify-content: center;}
         .line-btn.selected { background: var(--primary); color: white; border-color: var(--primary); transform: scale(0.95); }
         .line-btn.wide { grid-column: span 2; background: #fef3c7; color: #92400e; border-color: #fcd34d; }
         .line-btn.wide.selected { background: var(--primary); color: white; }
 
-        .btn-save-line { background: var(--bg-body); color: var(--text-main); border: 1px solid var(--border-line); padding: 15px; border-radius: 8px; font-weight: 900; cursor: pointer; width: 100%; margin-top: 10px; font-size: 14px; letter-spacing: 1px;}
+        .btn-save-line { background: var(--bg-body); color: var(--text-main); border: 1px solid var(--border-line); height: 48px; border-radius: 8px; font-weight: 900; cursor: pointer; width: 100%; margin-top: 10px; font-size: 14px; letter-spacing: 1px;}
         
-        /* Modal SweetAlert Custom UI */
         .swal-custom-popup { border-radius: 15px !important; padding: 25px !important; }
         .dark-mode .swal-custom-popup { background: var(--bg-card) !important; color: var(--text-main) !important; }
     </style>
@@ -140,9 +147,9 @@
     <div class="header-content">
         <div class="title-area">
             <div class="main-title">QC SEWING DASHBOARD</div>
-            <div class="sub-title">USGU DRESS 1 <span class="version-badge" id="verBadge">v1.2-REV</span></div>
+            <div class="sub-title">QUALITY ENGINEERING USGU DRESS 1 <span class="version-badge" id="verBadge">v1.2-REV</span></div>
         </div>
-        <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">DARK</button>
+        <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" title="Ganti Tema">🌙</button>
     </div>
 </div>
 
@@ -154,8 +161,9 @@
                 <select id="qc_inline" onchange="saveData()"></select>
                 <select id="qc_endline" onchange="saveData()"></select>
             </div>
-            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-sub); margin-top:4px; font-weight:bold;">
-                <span style="padding-left:5px;">(INLINE)</span><span style="padding-right:5px;">(ENDLINE)</span>
+            <div style="display:flex; font-size:10px; color:var(--text-sub); margin-top:6px; font-weight:bold;">
+                <span style="flex:1; text-align:center;">(INLINE)</span>
+                <span style="flex:1; text-align:center;">(ENDLINE)</span>
             </div>
         </div>
         
@@ -232,8 +240,8 @@
             </div>
         </div>
         
-        <div style="display: flex; gap: 10px;">
-            <button class="btn-add" style="flex: 1;" onclick="addDefectToList()">TAMBAHKAN KE DAFTAR</button>
+        <div style="display: flex; margin-top: 5px;">
+            <button class="btn-add" onclick="addDefectToList()">TAMBAHKAN KE DAFTAR</button>
         </div>
     </div>
 
@@ -242,7 +250,7 @@
         <div id="active_defects_container">
             <div class="empty-state" id="empty_state">
                 BELUM ADA DEFECT YANG DITAMBAHKAN.<br>
-                <span style="font-weight:normal; font-size:11px;">Silakan pilih Area & Jenis di atas lalu klik Tambahkan.</span>
+                <span style="font-weight:normal; font-size:11px; margin-top: 4px; display:block;">Silakan pilih Area & Jenis di atas lalu klik Tambahkan.</span>
             </div>
         </div>
     </div>
@@ -399,10 +407,12 @@
 
     let activeDefects = {}; 
 
+    // MODIFIKASI: Tombol Tema Emoji (Matahari / Bulan)
     function toggleTheme() { 
         document.body.classList.toggle('dark-mode'); 
-        document.getElementById('themeBtn').innerText = document.body.classList.contains('dark-mode') ? 'LIGHT' : 'DARK'; 
-        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode')); 
+        const isDark = document.body.classList.contains('dark-mode');
+        document.getElementById('themeBtn').innerText = isDark ? '☀️' : '🌙'; 
+        localStorage.setItem('darkMode', isDark); 
     }
     
     function setDefaultDate() { const d = new Date(); document.getElementById('tanggal').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
@@ -542,13 +552,11 @@
     }
 
     function initDropdowns() {
-        // Init QC List
         let htmlQC = '<option value="" disabled selected>-- Pilih --</option><option value="-" style="color:var(--danger);">TIDAK ADA/KOSONG</option>';
         listQC.forEach(qc => { htmlQC += `<option value="${qc}">${qc}</option>`; });
         document.getElementById('qc_inline').innerHTML = htmlQC;
         document.getElementById('qc_endline').innerHTML = htmlQC;
 
-        // Init Defect Area & Type
         let selArea = document.getElementById('sel_area');
         let selType = document.getElementById('sel_type');
         selArea.innerHTML = '<option value="" disabled selected>-- Pilih Area --</option>';
@@ -642,7 +650,7 @@
         }
 
         if(count === 0) {
-            container.innerHTML = `<div class="empty-state" id="empty_state">BELUM ADA DEFECT YANG DITAMBAHKAN.<br><span style="font-weight:normal; font-size:11px;">Silakan pilih Area & Jenis di atas lalu klik Tambahkan.</span></div>`;
+            container.innerHTML = `<div class="empty-state" id="empty_state">BELUM ADA DEFECT YANG DITAMBAHKAN.<br><span style="font-weight:normal; font-size:11px; margin-top: 4px; display:block;">Silakan pilih Area & Jenis di atas lalu klik Tambahkan.</span></div>`;
         } else {
             container.innerHTML = html;
         }
@@ -687,10 +695,16 @@
         const insp100 = elInsp100 ? (parseInt(elInsp100.value) || 0) : 0;
         
         let pTls = document.getElementById('pct_def_tls'); 
-        if(pTls) pTls.value = inspTls > 0 ? ((totalSumTls / inspTls) * 100).toFixed(1) + "%" : "0%";
+        if(pTls) {
+            // MODIFIKASI: Menggunakan javascript ternary division murni tanpa error output
+            pTls.value = inspTls > 0 ? ((totalSumTls / inspTls) * 100).toFixed(1) + "%" : "0%";
+        }
         
         let p100 = document.getElementById('pct_def_100');
-        if(p100) p100.value = insp100 > 0 ? ((totalSum100 / insp100) * 100).toFixed(1) + "%" : "0%";
+        if(p100) {
+            // MODIFIKASI: Menggunakan javascript ternary division murni tanpa error output
+            p100.value = insp100 > 0 ? ((totalSum100 / insp100) * 100).toFixed(1) + "%" : "0%";
+        }
         
         let totalInspChart = insp100;
         let totalDefChart = totalSum100;
@@ -800,7 +814,13 @@
         }
 
         if(!saved.tanggal) { setDefaultDate(); } 
-        if(localStorage.getItem('darkMode') === 'true') { document.body.classList.add('dark-mode'); document.getElementById('themeBtn').innerText = 'LIGHT';} 
+        // MODIFIKASI: Memastikan Emoji benar saat pertama kali dimuat
+        if(localStorage.getItem('darkMode') === 'true') { 
+            document.body.classList.add('dark-mode'); 
+            document.getElementById('themeBtn').innerText = '☀️';
+        } else {
+            document.getElementById('themeBtn').innerText = '🌙';
+        }
         checkOfflineBadge();
     }
     
@@ -824,7 +844,6 @@
 
                 let sh = document.getElementById('shift_hours'); if(sh) sh.innerText = ""; 
                 
-                // Reset Dropdown QC
                 document.getElementById('qc_inline').value = "";
                 document.getElementById('qc_endline').value = "";
 
@@ -834,9 +853,7 @@
         });
     }
 
-    // MODIFIKASI: UI/UX Pop-up Tutup Shift (2 Tahap Keamanan)
     function recapSPV() {
-        // TAHAP 1: Minta Password Saja (Tampilan Polos)
         Swal.fire({
             title: 'TUTUP SHIFT',
             text: 'Masukkan Kode Akses SPV untuk merekap data hari ini:',
@@ -852,9 +869,7 @@
             cancelButtonText: 'BATAL'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Validasi Password
                 if (result.value === 'SEWD1') {
-                    // Jika Benar, Buka Menu Rahasia
                     showReviewMenu();
                 } else {
                     Swal.fire('Akses Ditolak', 'Password Salah!', 'error');
@@ -863,7 +878,6 @@
         });
     }
 
-    // TAHAP 2: Menu Rahasia Target Review (Hanya muncul jika password benar)
     function showReviewMenu() {
         Swal.fire({
             title: '⚙️ TARGET LAPORAN REVIEW',
