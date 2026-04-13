@@ -871,15 +871,14 @@
         });
     }
 
-    // FUNGSI TOGGLE UNTUK CHECKBOX WHITELIST
+    // // FUNGSI TOGGLE UNTUK CHECKBOX WHITELIST
     window.toggleLineInputs = function(chk, line) {
         let inputs = document.getElementById('r-inputs-' + line);
         if(chk.checked) {
             inputs.style.opacity = '0.3';
             inputs.style.pointerEvents = 'none';
-            // Kosongkan nilai agar tidak terkirim
-            document.getElementById('min-' + line).value = "";
-            document.getElementById('max-' + line).value = "";
+            // Kosongkan nilai target agar tidak terkirim
+            document.getElementById('target-' + line).value = "";
         } else {
             inputs.style.opacity = '1';
             inputs.style.pointerEvents = 'auto';
@@ -951,8 +950,7 @@
                         Abaikan (Whitelist)
                     </label>
                     <div class="r-inputs" id="r-inputs-${item.line}">
-                        <input type="number" id="min-${item.line}" class="r-input min-val" placeholder="Min %" step="0.1">
-                        <input type="number" id="max-${item.line}" class="r-input max-val" placeholder="Max %" step="0.1">
+                        <input type="number" id="target-${item.line}" class="r-input target-val" placeholder="Target % (Cth: 8.5)" step="0.1">
                     </div>
                 </div>
             </div>
@@ -963,7 +961,7 @@
             html: `
                 <div style="text-align: left; background: var(--bg-section); padding: 10px; border-radius: 8px; border: 1px solid var(--border-line);">
                     <div style="font-size: 10.5px; color: var(--text-sub); margin-bottom: 15px; line-height:1.4;">
-                        <i>*Sistem akan menyamarkan angka defect sesuai target per line. Centang <b>"Abaikan"</b> jika line tidak ingin diubah datanya.</i>
+                        <i>*Sistem akan menyesuaikan angka defect tepat di target yang Anda tentukan. Centang <b>"Abaikan"</b> jika line tidak ingin diubah.</i>
                     </div>
                     <div style="max-height: 55vh; overflow-y: auto; padding-right: 5px;">
                         ${listHtml}
@@ -987,19 +985,18 @@
                     if(isWhitelist) {
                         lineTargets[ln] = "WHITELIST";
                     } else {
-                        let min = document.getElementById(`min-${ln}`).value;
-                        let max = document.getElementById(`max-${ln}`).value;
+                        // AMBIL NILAI TARGET TUNGGAL
+                        let target = document.getElementById(`target-${ln}`).value;
                         
-                        if(!min || !max) { isValid = false; }
-                        else if (parseFloat(min) > parseFloat(max)) { isValid = false; }
+                        if(!target) { isValid = false; }
                         else {
-                            lineTargets[ln] = { min: min, max: max };
+                            lineTargets[ln] = { target: target };
                         }
                     }
                 });
 
                 if(!isValid) {
-                    Swal.showValidationMessage('Pastikan semua target (Min & Max) diisi benar!');
+                    Swal.showValidationMessage('Pastikan semua Target % diisi dengan angka!');
                     return false;
                 }
                 
