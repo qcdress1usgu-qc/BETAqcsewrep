@@ -134,6 +134,18 @@
         
         .swal-custom-popup { border-radius: 15px !important; padding: 25px !important; }
         .dark-mode .swal-custom-popup { background: var(--bg-card) !important; color: var(--text-main) !important; }
+        
+        /* CSS KHUSUS MODAL REVIEW PER-LINE */
+        .r-card { background: var(--bg-card); border: 1px solid var(--border-line); border-radius: 8px; padding: 12px; margin-bottom: 10px; text-align: left; position: relative;}
+        .r-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-line); padding-bottom: 8px; margin-bottom: 10px;}
+        .r-title { font-weight: 900; color: var(--primary); font-size: 13px;}
+        .r-badge { font-size: 10px; background: var(--bg-section); padding: 4px 8px; border-radius: 4px; font-weight:bold; color: var(--danger);}
+        .r-body { display: flex; align-items: center; gap: 10px;}
+        .r-chk-area { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; color: var(--text-main); cursor: pointer;}
+        .r-chk { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer;}
+        .r-inputs { display: flex; gap: 8px; flex: 1; transition: opacity 0.2s;}
+        .r-input { width: 100%; height: 38px; border: 1px solid var(--border-line); border-radius: 6px; padding: 0 8px; font-size: 13px; text-align: center; font-weight:bold; background: var(--bg-input); color: var(--text-main);}
+        .r-stats { font-size: 10px; color: var(--text-sub); display: block; margin-top: 4px; font-weight: 600;}
     </style>
 </head>
 <body>
@@ -859,6 +871,21 @@
         });
     }
 
+    // FUNGSI TOGGLE UNTUK CHECKBOX WHITELIST
+    window.toggleLineInputs = function(chk, line) {
+        let inputs = document.getElementById('r-inputs-' + line);
+        if(chk.checked) {
+            inputs.style.opacity = '0.3';
+            inputs.style.pointerEvents = 'none';
+            // Kosongkan nilai agar tidak terkirim
+            document.getElementById('min-' + line).value = "";
+            document.getElementById('max-' + line).value = "";
+        } else {
+            inputs.style.opacity = '1';
+            inputs.style.pointerEvents = 'auto';
+        }
+    }
+
     function recapSPV() {
         Swal.fire({
             title: 'TUTUP SHIFT',
@@ -876,7 +903,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 if (result.value === 'SEWD1') {
-                    showReviewMenu();
+                    fetchDailySummary(result.value);
                 } else {
                     Swal.fire('Akses Ditolak', 'Password Salah!', 'error');
                 }
@@ -884,39 +911,62 @@
         });
     }
 
-    function showReviewMenu() {
-        // Buat tombol-tombol grid untuk whitelist persis seperti menu pilih line
-        let lineOptionsHtml = listLineMaster.map(line => {
-            let isWide = (line === "PREPARATION" || line === "MINILINE") ? 'wide' : '';
-            // Tambahkan class 'whitelist-btn' dan fungsi onclick untuk nyala-mati (toggle)
-            return `<button type="button" class="line-btn ${isWide} whitelist-btn" data-line="${line}" onclick="this.classList.toggle('selected')">${line}</button>`;
-        }).join('');
+    function fetchDailySummary(password) {
+        document.getElementById('loading').style.display = 'flex';
+        document.getElementById('loading-text').innerText = "MENGAMBIL DATA...";
+
+        const payload = { action: "get_summary", version: APP_VERSION, password: password };
+
+        fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' }})
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('loading').style.display = 'none';
+            if(data.result === "success") {
+                showReviewMenu(data.data, password);
+            } else {
+                Swal.fire('Error', data.error, 'error'); 
+            }
+        }).catch(err => { 
+            document.getElementById('loading').style.display = 'none'; 
+            Swal.fire('Koneksi Gagal', 'Gagal mengambil data harian dari server.', 'error');
+        });
+    }
+
+    function showReviewMenu(summaryData, password) {
+        if(summaryData.length === 0) {
+            Swal.fire('Info', 'Belum ada data produksi yang masuk hari ini.', 'info');
+            return;
+        }
+
+        let listHtml = summaryData.map(item => `
+            <div class="r-card" data-line="${item.line}">
+                <div class="r-head">
+                    <span class="r-title">LINE ${item.line}</span>
+                    <span class="r-badge">${item.pct}% DEFECT</span>
+                </div>
+                <span class="r-stats">Aktual: ${item.def} Defect / ${item.insp} Insp</span>
+                <div class="r-body" style="margin-top: 8px;">
+                    <label class="r-chk-area">
+                        <input type="checkbox" class="r-chk whitelist-chk" data-line="${item.line}" onchange="toggleLineInputs(this, '${item.line}')">
+                        Abaikan (Whitelist)
+                    </label>
+                    <div class="r-inputs" id="r-inputs-${item.line}">
+                        <input type="number" id="min-${item.line}" class="r-input min-val" placeholder="Min %" step="0.1">
+                        <input type="number" id="max-${item.line}" class="r-input max-val" placeholder="Max %" step="0.1">
+                    </div>
+                </div>
+            </div>
+        `).join('');
 
         Swal.fire({
-            title: 'TARGET LAPORAN REVIEW',
+            title: 'SET TARGET PER LINE',
             html: `
-                <div style="text-align: left; background: var(--bg-section); padding: 15px; border-radius: 8px; border: 1px solid var(--border-line);">
-                    <label style="font-size: 11px; font-weight: 800; color: var(--text-sub);">📊 TARGET RATE DEFECT (%)</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px;">
-                        <div>
-                            <span style="font-size: 10px; color: var(--danger); font-weight:bold;">MINIMUM</span>
-                            <input type="number" id="swal-min" class="swal2-input" placeholder="Cth: 7.5" step="0.1" style="margin: 0; width: 100%; height: 45px; text-align:center; font-weight:bold; color:var(--text-brand);">
-                        </div>
-                        <div>
-                            <span style="font-size: 10px; color: var(--primary); font-weight:bold;">MAXIMUM</span>
-                            <input type="number" id="swal-max" class="swal2-input" placeholder="Cth: 8.2" step="0.1" style="margin: 0; width: 100%; height: 45px; text-align:center; font-weight:bold; color:var(--text-brand);">
-                        </div>
+                <div style="text-align: left; background: var(--bg-section); padding: 10px; border-radius: 8px; border: 1px solid var(--border-line);">
+                    <div style="font-size: 10.5px; color: var(--text-sub); margin-bottom: 15px; line-height:1.4;">
+                        <i>*Sistem akan menyamarkan angka defect sesuai target per line. Centang <b>"Abaikan"</b> jika line tidak ingin diubah datanya.</i>
                     </div>
-                    
-                    <label style="font-size: 11px; font-weight: 800; color: var(--text-sub); margin-top: 20px; display:block;">🛡️ WHITELIST LINE (KLIK UNTUK PENGECUALIAN)</label>
-                    <div style="max-height: 180px; overflow-y: auto; padding: 10px; border: 1px solid var(--border-line); border-radius: 8px; background: var(--bg-input); margin-top: 5px;">
-                        <div class="grid-line-selection">
-                            ${lineOptionsHtml}
-                        </div>
-                    </div>
-                    
-                    <div style="font-size: 10.5px; color: var(--text-sub); margin-top: 15px; line-height:1.4;">
-                        <i>*Line yang <b>menyala (diklik)</b> tidak akan diubah datanya. Biarkan mati semua jika ingin di-adjust seluruhnya.</i>
+                    <div style="max-height: 55vh; overflow-y: auto; padding-right: 5px;">
+                        ${listHtml}
                     </div>
                 </div>
             `,
@@ -927,32 +977,47 @@
             confirmButtonText: 'PROSES DATA',
             cancelButtonText: 'BATAL',
             preConfirm: () => {
-                const min = document.getElementById('swal-min').value;
-                const max = document.getElementById('swal-max').value;
+                let lineTargets = {};
+                let isValid = true;
                 
-                // Ambil semua tombol line yang menyala (punya class 'selected')
-                const selectedBtns = document.querySelectorAll('.whitelist-btn.selected');
-                const whitelistArr = Array.from(selectedBtns).map(btn => btn.getAttribute('data-line'));
-                const whitelist = whitelistArr.join(','); // Gabungkan jadi "1,3A,5"
+                summaryData.forEach(item => {
+                    let ln = item.line;
+                    let isWhitelist = document.querySelector(`.whitelist-chk[data-line="${ln}"]`).checked;
+                    
+                    if(isWhitelist) {
+                        lineTargets[ln] = "WHITELIST";
+                    } else {
+                        let min = document.getElementById(`min-${ln}`).value;
+                        let max = document.getElementById(`max-${ln}`).value;
+                        
+                        if(!min || !max) { isValid = false; }
+                        else if (parseFloat(min) > parseFloat(max)) { isValid = false; }
+                        else {
+                            lineTargets[ln] = { min: min, max: max };
+                        }
+                    }
+                });
 
-                if (!min || !max) Swal.showValidationMessage('Isi Target Min dan Max!');
-                if (parseFloat(min) > parseFloat(max)) Swal.showValidationMessage('Min tidak boleh lebih besar dari Max!');
+                if(!isValid) {
+                    Swal.showValidationMessage('Pastikan semua target (Min & Max) diisi benar!');
+                    return false;
+                }
                 
-                return { min, max, whitelist };
+                return { password: password, lineTargets: lineTargets };
             }
         }).then((res) => {
             if(res.isConfirmed) {
-                executeRecap(res.value.min, res.value.max, res.value.whitelist);
+                executeRecap(res.value.password, res.value.lineTargets);
             }
         });
     }
 
-    function executeRecap(min, max, whitelist) {
+    function executeRecap(password, lineTargets) {
         if(!SCRIPT_URL) return;
         document.getElementById('loading').style.display = 'flex';
         document.getElementById('loading-text').innerText = "MEMBUAT REVIEW...";
 
-        const payload = { action: "recap", version: APP_VERSION, password: "SEWD1", targetMin: min, targetMax: max, whitelist: whitelist };
+        const payload = { action: "recap", version: APP_VERSION, password: password, lineTargets: lineTargets };
 
         fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' }})
         .then(res => res.json())
