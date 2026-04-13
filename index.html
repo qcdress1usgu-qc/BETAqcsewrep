@@ -65,8 +65,8 @@
         
         .dual-input { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; min-width: 0;}
         
-        .shift-container { display: flex; align-items: center; gap: 10px; }
-        .shift-container input[type="time"] { flex: 1; text-align: center; padding: 0; }
+        .shift-container { display: flex; align-items: center; gap: 10px; height: 45px;}
+        .shift-container input[type="time"] { flex: 1; text-align: center; padding: 0; height: 100%;}
         .shift-divider { font-weight: 900; color: var(--text-sub); }
 
         /* RESPONSIVE UNTUK HP */
@@ -237,13 +237,13 @@
         <label style="border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 15px; font-size: 12px; color: var(--primary); font-weight: 800;">TAMBAH DEFECT BARU:</label>
         
         <div class="grid">
-            <div class="input-group">
+            <div class="input-group" style="margin-bottom:0;">
                 <label>1. PILIH AREA / PROSES:</label>
                 <select id="sel_area">
                     <option value="" disabled selected>-- Pilih Area --</option>
                 </select>
             </div>
-            <div class="input-group">
+            <div class="input-group" style="margin-bottom:0;">
                 <label>2. PILIH JENIS DEFECT:</label>
                 <select id="sel_type">
                     <option value="" disabled selected>-- Pilih Jenis --</option>
@@ -251,7 +251,7 @@
             </div>
         </div>
         
-        <div style="display: flex; margin-top: 5px;">
+        <div style="display: flex; margin-top: 15px;">
             <button class="btn-add" onclick="addDefectToList()">TAMBAHKAN KE DAFTAR</button>
         </div>
     </div>
@@ -309,7 +309,7 @@
             </div>
         </div>
         
-        <div class="input-group" style="margin-top: 5px; grid-column: 1 / -1; width: 100%;">
+        <div class="input-group" style="margin-top: 14px; width: 100%;">
             <label>KETERANGAN:</label>
             <input type="text" id="keterangan" placeholder="Isi Note..." oninput="saveData()">
         </div>
@@ -349,7 +349,7 @@
     }
 
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbykRNhpXwq1fuPsoP7tGHeKvReiVYBtgrVMv-Dd8ghDEMc5f0RgpQh36Mg5r9kQUGnq/exec";
-    const APP_VERSION = "1.2"; 
+    const APP_VERSION = "2.0"; 
 
     let defectChart; 
     let selectedLine = "";
@@ -900,8 +900,12 @@
                             <input type="number" id="swal-max" class="swal2-input" placeholder="Cth: 8.2" step="0.1" style="margin: 0; width: 100%; height: 45px; text-align:center; font-weight:bold; color:var(--text-brand);">
                         </div>
                     </div>
+                    
+                    <label style="font-size: 11px; font-weight: 800; color: var(--text-sub); margin-top: 15px;">🛡️ WHITELIST LINE (JANGAN DIUBAH)</label>
+                    <input type="text" id="swal-whitelist" class="swal2-input" placeholder="Cth: 1, 3A, 5 (Kosongkan jika tidak ada)" style="margin: 5px 0 0 0; width: 100%; height: 45px; font-size:14px; box-sizing:border-box;">
+                    
                     <div style="font-size: 10.5px; color: var(--text-sub); margin-top: 15px; line-height:1.4;">
-                        <i>*Sistem akan menyamarkan angka defect aktual secara acak dan proporsional untuk mencapai target laporan.</i>
+                        <i>*Sistem akan menyamarkan angka defect aktual secara acak dan proporsional untuk mencapai target laporan. Line yang masuk Whitelist datanya akan dibiarkan murni 100%.</i>
                     </div>
                 </div>
             `,
@@ -914,23 +918,24 @@
             preConfirm: () => {
                 const min = document.getElementById('swal-min').value;
                 const max = document.getElementById('swal-max').value;
+                const whitelist = document.getElementById('swal-whitelist').value;
                 if (!min || !max) Swal.showValidationMessage('Isi Target Min dan Max!');
                 if (parseFloat(min) > parseFloat(max)) Swal.showValidationMessage('Min tidak boleh lebih besar dari Max!');
-                return { min, max };
+                return { min, max, whitelist };
             }
         }).then((res) => {
             if(res.isConfirmed) {
-                executeRecap(res.value.min, res.value.max);
+                executeRecap(res.value.min, res.value.max, res.value.whitelist);
             }
         });
     }
 
-    function executeRecap(min, max) {
+    function executeRecap(min, max, whitelist) {
         if(!SCRIPT_URL) return;
         document.getElementById('loading').style.display = 'flex';
         document.getElementById('loading-text').innerText = "MEMBUAT REVIEW...";
 
-        const payload = { action: "recap", version: APP_VERSION, password: "SEWD1", targetMin: min, targetMax: max };
+        const payload = { action: "recap", version: APP_VERSION, password: "SEWD1", targetMin: min, targetMax: max, whitelist: whitelist };
 
         fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' }})
         .then(res => res.json())
