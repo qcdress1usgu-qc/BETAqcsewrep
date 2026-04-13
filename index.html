@@ -42,9 +42,10 @@
         .version-badge { background: var(--primary); color: white; padding: 3px 6px; border-radius: 4px; font-size: 9px; font-weight: 900;}
         
         /* THEME TOGGLE (EMOJI SIMETRIS) */
-        .theme-toggle { background: var(--bg-body); border: 1px solid var(--border-line); border-radius: 50%; width: 40px; height: 40px; font-size: 18px; display: flex; justify-content: center; align-items: center; cursor: pointer; outline: none; box-shadow: var(--shadow-sm); transition: all 0.2s;}
+        .theme-toggle { background: transparent; border: 1px solid transparent; border-radius: 50%; width: 40px; height: 40px; font-size: 18px; display: flex; justify-content: center; align-items: center; cursor: pointer; outline: none; box-shadow: none; transition: all 0.2s; padding: 0; }
         .theme-toggle:hover { transform: scale(1.05); }
         .theme-toggle:active { transform: scale(0.95); }
+        .theme-toggle img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
         
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
         .card { background: var(--bg-card); border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-line); }
