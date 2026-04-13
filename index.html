@@ -885,11 +885,15 @@
     }
 
     function showReviewMenu() {
-        // Otomatis membuat daftar <option> untuk dropdown mengambil dari listLineMaster
-        let lineOptions = listLineMaster.map(line => `<option value="${line}">Line ${line}</option>`).join('');
+        // Buat tombol-tombol grid untuk whitelist persis seperti menu pilih line
+        let lineOptionsHtml = listLineMaster.map(line => {
+            let isWide = (line === "PREPARATION" || line === "MINILINE") ? 'wide' : '';
+            // Tambahkan class 'whitelist-btn' dan fungsi onclick untuk nyala-mati (toggle)
+            return `<button type="button" class="line-btn ${isWide} whitelist-btn" data-line="${line}" onclick="this.classList.toggle('selected')">${line}</button>`;
+        }).join('');
 
         Swal.fire({
-            title: '⚙️ TARGET LAPORAN REVIEW',
+            title: 'TARGET LAPORAN REVIEW',
             html: `
                 <div style="text-align: left; background: var(--bg-section); padding: 15px; border-radius: 8px; border: 1px solid var(--border-line);">
                     <label style="font-size: 11px; font-weight: 800; color: var(--text-sub);">📊 TARGET RATE DEFECT (%)</label>
@@ -904,16 +908,15 @@
                         </div>
                     </div>
                     
-                    <label style="font-size: 11px; font-weight: 800; color: var(--text-sub); margin-top: 15px;">🛡️ WHITELIST LINE (BISA PILIH > 1)</label>
-                    <select id="swal-whitelist" class="swal2-input" multiple style="margin: 5px 0 0 0; width: 100%; height: 100px; font-size:14px; padding: 8px; box-sizing:border-box;">
-                        ${lineOptions}
-                    </select>
-                    <div style="font-size: 9px; color: var(--danger); margin-top: 4px;">
-                        <i>*Tahan layar (HP) atau tahan Ctrl (PC) untuk memilih lebih dari 1 line. Biarkan kosong jika tidak ada.</i>
+                    <label style="font-size: 11px; font-weight: 800; color: var(--text-sub); margin-top: 20px; display:block;">🛡️ WHITELIST LINE (KLIK UNTUK PENGECUALIAN)</label>
+                    <div style="max-height: 180px; overflow-y: auto; padding: 10px; border: 1px solid var(--border-line); border-radius: 8px; background: var(--bg-input); margin-top: 5px;">
+                        <div class="grid-line-selection">
+                            ${lineOptionsHtml}
+                        </div>
                     </div>
                     
                     <div style="font-size: 10.5px; color: var(--text-sub); margin-top: 15px; line-height:1.4;">
-                        <i>*Sistem akan menyamarkan angka defect aktual secara acak dan proporsional. Line Whitelist akan dibiarkan murni 100%.</i>
+                        <i>*Line yang <b>menyala (diklik)</b> tidak akan diubah datanya. Biarkan mati semua jika ingin di-adjust seluruhnya.</i>
                     </div>
                 </div>
             `,
@@ -927,9 +930,10 @@
                 const min = document.getElementById('swal-min').value;
                 const max = document.getElementById('swal-max').value;
                 
-                // Logika baru: Mengambil semua line yang dipilih di dropdown multiple
-                const whitelistSelect = document.getElementById('swal-whitelist');
-                const whitelist = Array.from(whitelistSelect.selectedOptions).map(opt => opt.value).join(',');
+                // Ambil semua tombol line yang menyala (punya class 'selected')
+                const selectedBtns = document.querySelectorAll('.whitelist-btn.selected');
+                const whitelistArr = Array.from(selectedBtns).map(btn => btn.getAttribute('data-line'));
+                const whitelist = whitelistArr.join(','); // Gabungkan jadi "1,3A,5"
 
                 if (!min || !max) Swal.showValidationMessage('Isi Target Min dan Max!');
                 if (parseFloat(min) > parseFloat(max)) Swal.showValidationMessage('Min tidak boleh lebih besar dari Max!');
