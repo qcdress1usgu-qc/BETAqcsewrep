@@ -170,7 +170,7 @@
             <div class="sub-title">QUALITY ENGINEERING USGU DRESS 1 <span class="version-badge" id="verBadge">V2.0</span></div>
         </div>
         <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" title="Ganti Tema">
-        <img src="logodark.png" alt="Tema" style="width: 20px; height: 20px; object-fit: contain;">
+        <img src="logodark.png" alt="Tema" style="width: 60px; height: 60px; object-fit: contain;">
         </button>
     </div>
 </div>
@@ -436,8 +436,8 @@
         const isDark = document.body.classList.contains('dark-mode');
         
         // Masukkan link logo kamu di sini
-        const logoMatahari = '<img src="logolight.png" style="width: 20px; height: 20px; object-fit: contain;">';
-        const logoBulan = '<img src="logodark.png" style="width: 20px; height: 20px; object-fit: contain;">';
+        const logoMatahari = '<img src="logolight.png" style="width: 60px; height: 60px; object-fit: contain;">';
+        const logoBulan = '<img src="logodark.png" style="width: 60px; height: 60px; object-fit: contain;">';
         
         document.getElementById('themeBtn').innerHTML = isDark ? logoMatahari : logoBulan; 
         localStorage.setItem('darkMode', isDark); 
@@ -840,8 +840,8 @@
         }
 
         if(!saved.tanggal) { setDefaultDate(); } 
-        const logoMatahari = '<img src="logolight.png" style="width: 20px; height: 20px; object-fit: contain;">';
-        const logoBulan = '<img src="logodark.png" style="width: 20px; height: 20px; object-fit: contain;">';
+        const logoMatahari = '<img src="logolight.png" style="width: 60px; height: 60px; object-fit: contain;">';
+        const logoBulan = '<img src="logodark.png" style="width: 60px; height: 60px; object-fit: contain;">';
 
         if(localStorage.getItem('darkMode') === 'true') { 
             document.body.classList.add('dark-mode'); 
